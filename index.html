@@ -5,10 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="やさいかんさつ">
+  <link rel="apple-touch-icon" href="./icon.png?v=4">
+  <link rel="icon" type="image/png" href="./icon.png?v=4">
   <title>やさい かんさつ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
+    /* 野菜ごとに色を動的に変えるためのCSS変数 */
+    :root {
+      --theme-bg: #fef2f2;
+      --theme-text-dark: #b91c1c;
+      --theme-text-main: #ef4444;
+      --theme-border-light: #fecaca;
+      --theme-border-medium: #f87171;
+      --theme-border-main: #ef4444;
+      --theme-header-bg: #ef4444;
+      --theme-header-btn: #dc2626;
+    }
+    .bg-theme-bg { background-color: var(--theme-bg); }
+    .text-theme-dark { color: var(--theme-text-dark); }
+    .text-theme-main { color: var(--theme-text-main); }
+    .border-theme-light { border-color: var(--theme-border-light); }
+    .border-theme-medium { border-color: var(--theme-border-medium); }
+    .border-theme-main { border-color: var(--theme-border-main); }
+    .bg-theme-header { background-color: var(--theme-header-bg); }
+    .bg-theme-btn { background-color: var(--theme-header-btn); }
+
     body {
       user-select: none;
       -webkit-user-select: none;
@@ -27,7 +50,7 @@
       box-shadow: 0 6px 0 rgba(0,0,0,0.15);
       transition: all 0.1s;
     }
-    .btn-3d:active {
+    .btn-3d:active:not(:disabled) {
       box-shadow: 0 0 0 rgba(0,0,0,0);
       transform: translateY(6px);
     }
@@ -43,26 +66,38 @@
     }
   </style>
 </head>
-<body class="h-screen w-screen flex flex-col items-center justify-center relative text-gray-800 bg-red-50">
+<body class="h-screen w-screen flex flex-col items-center justify-center relative text-gray-800 bg-theme-bg">
 
-  <!-- 0. なまえを おしえてね がめん -->
+  <!-- 0. なまえとやさいを えらぶ がめん -->
   <div id="view-select" class="view hidden scrollable flex flex-col items-center justify-start h-full w-full px-4 md:px-8 py-12 md:py-16 box-border">
-    <div class="w-full max-w-md mb-10 bg-white p-8 rounded-[3rem] shadow-md border-4 border-red-200 shrink-0 mt-8">
-      <div class="text-9xl text-center mb-6">🍅</div>
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6 text-center leading-relaxed">はじめに なまえを<br>おしえてね</h1>
-      <input type="text" id="userNameInput" class="w-full rounded-2xl p-6 text-2xl md:text-3xl font-bold border-4 border-gray-300 text-center focus:border-red-500 outline-none bg-gray-50" placeholder="ここを タップ">
-      <div id="nameError" class="hidden text-red-500 text-xl md:text-2xl font-bold text-center mt-4 animate-bounce">なまえを かいてね！</div>
+    <div class="w-full max-w-md mb-8 bg-white p-6 md:p-8 rounded-[3rem] shadow-md border-4 border-gray-200 shrink-0 mt-4">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-700 mb-4 text-center leading-relaxed">はじめに なまえを<br>おしえてね</h1>
+      <input type="text" id="userNameInput" class="w-full rounded-2xl p-4 text-2xl font-bold border-4 border-gray-300 text-center focus:border-green-500 outline-none bg-gray-50" placeholder="ここを タップ">
+      <div id="nameError" class="hidden text-red-500 text-xl font-bold text-center mt-2 animate-bounce">なまえを かいてね！</div>
     </div>
-    <button onclick="startApp()" class="btn-3d bg-red-500 text-white rounded-[3rem] py-6 px-16 text-3xl md:text-4xl font-bold flex flex-col items-center justify-center shrink-0">
-      はじめる！
-    </button>
+
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6 text-center leading-relaxed shrink-0">どの やさい を<br>そだてる？</h1>
+    <div class="flex flex-col md:flex-row justify-center gap-4 w-full max-w-4xl shrink-0 px-2 pb-10">
+      <button onclick="selectYasai('tomato')" class="btn-3d bg-red-400 hover:bg-red-500 text-white rounded-[2rem] md:rounded-[3rem] py-6 md:py-8 px-4 flex flex-col items-center justify-center gap-4 flex-1">
+        <span class="text-7xl md:text-8xl transform hover:scale-110 transition-transform">🍅</span>
+        <span class="text-2xl md:text-4xl font-bold">トマト</span>
+      </button>
+      <button onclick="selectYasai('nasu')" class="btn-3d bg-purple-400 hover:bg-purple-500 text-white rounded-[2rem] md:rounded-[3rem] py-6 md:py-8 px-4 flex flex-col items-center justify-center gap-4 flex-1">
+        <span class="text-7xl md:text-8xl transform hover:scale-110 transition-transform">🍆</span>
+        <span class="text-2xl md:text-4xl font-bold">ナス</span>
+      </button>
+      <button onclick="selectYasai('piman')" class="btn-3d bg-green-400 hover:bg-green-500 text-white rounded-[2rem] md:rounded-[3rem] py-6 md:py-8 px-4 flex flex-col items-center justify-center gap-4 flex-1">
+        <span class="text-7xl md:text-8xl transform hover:scale-110 transition-transform">🫑</span>
+        <span class="text-2xl md:text-4xl font-bold">ピーマン</span>
+      </button>
+    </div>
   </div>
 
   <!-- 1. さいしょの がめん（ホーム） -->
   <div id="view-home" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 pt-10 md:pt-16 pb-8 md:pb-12 box-border">
     <div class="flex items-center gap-3 mb-2 md:mb-4 shrink-0">
       <div id="homeIcon" class="text-5xl md:text-6xl">🍅</div>
-      <h1 id="homeTitle" class="text-2xl md:text-4xl font-bold text-red-700">やさいの きろく</h1>
+      <h1 id="homeTitle" class="text-2xl md:text-4xl font-bold text-theme-dark">やさいの きろく</h1>
     </div>
     
     <div class="flex flex-col md:flex-row gap-3 w-full max-w-5xl flex-1 min-h-0">
@@ -72,7 +107,7 @@
           <div class="absolute -bottom-4 -left-4 text-5xl opacity-20">🌟</div>
           
           <div class="text-base md:text-lg font-bold text-yellow-800 mb-1.5 z-10">
-            あつめた スタンプ： <span id="totalStampCount" class="text-3xl md:text-4xl text-red-500 mx-1">0</span> こ
+            あつめた スタンプ： <span id="totalStampCount" class="text-3xl md:text-4xl text-theme-main mx-1">0</span> こ
           </div>
           
           <div class="bg-white px-4 py-2 rounded-xl w-full border-2 border-yellow-200 text-center z-10 mb-1.5">
@@ -86,11 +121,11 @@
           <div id="nextTitleHint" class="text-xs md:text-sm font-bold text-yellow-700 mt-1 z-10">つぎの しょうごう まで あと 3こ！</div>
         </div>
 
-        <div class="bg-white rounded-2xl p-2 md:p-4 border-4 border-red-200 shadow-sm flex flex-col flex-1 min-h-0">
-          <div class="flex justify-between items-center mb-1 md:mb-2 bg-red-50 rounded-xl p-1 md:p-2 shrink-0">
-            <button onclick="changeMonth(-1)" class="btn-3d bg-white text-red-500 rounded-full w-10 h-10 md:w-12 md:h-12 text-lg md:text-xl font-bold flex items-center justify-center shadow">◀</button>
-            <h2 id="calendarTitle" class="text-lg md:text-2xl font-bold text-red-700">〇がつ</h2>
-            <button onclick="changeMonth(1)" class="btn-3d bg-white text-red-500 rounded-full w-10 h-10 md:w-12 md:h-12 text-lg md:text-xl font-bold flex items-center justify-center shadow">▶</button>
+        <div class="bg-white rounded-2xl p-2 md:p-4 border-4 border-theme-light shadow-sm flex flex-col flex-1 min-h-0">
+          <div class="flex justify-between items-center mb-1 md:mb-2 bg-theme-bg rounded-xl p-1 md:p-2 shrink-0">
+            <button onclick="changeMonth(-1)" class="btn-3d bg-white text-theme-main rounded-full w-10 h-10 md:w-12 md:h-12 text-lg md:text-xl font-bold flex items-center justify-center shadow">◀</button>
+            <h2 id="calendarTitle" class="text-lg md:text-2xl font-bold text-theme-dark">〇がつ</h2>
+            <button onclick="changeMonth(1)" class="btn-3d bg-white text-theme-main rounded-full w-10 h-10 md:w-12 md:h-12 text-lg md:text-xl font-bold flex items-center justify-center shadow">▶</button>
           </div>
           <div class="flex-1 overflow-y-auto">
             <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center w-full pb-1">
@@ -126,21 +161,41 @@
   <!-- 2. しゃしんを かくにんする がめん（プレビュー） -->
   <div id="view-preview" class="view hidden scrollable flex flex-col items-center justify-start h-full w-full px-4 md:px-8 pt-10 md:pt-16 pb-16 md:pb-24 box-border">
     <h2 class="text-3xl md:text-4xl font-bold text-blue-700 mb-4 md:mb-6" id="previewDate">〇がつ〇にち</h2>
-    <div class="w-full max-w-2xl h-56 md:h-72 bg-white rounded-3xl shadow-inner flex items-center justify-center overflow-hidden mb-4 md:mb-6 border-4 border-gray-200 p-2 shrink-0">
+    
+    <div class="w-full max-w-4xl h-56 md:h-72 bg-white rounded-3xl shadow-inner flex items-center justify-center overflow-hidden mb-4 border-4 border-gray-200 p-2 shrink-0">
       <img id="previewImage" src="" alt="とったしゃしん" class="max-w-full max-h-full object-contain rounded-2xl">
     </div>
 
-    <!-- ★選択式のカード -->
-    <div class="w-full max-w-2xl mb-4 md:mb-6 shrink-0">
-      <label class="block text-2xl md:text-3xl font-bold text-green-700 mb-3 md:mb-4 flex items-center gap-2">
-        <span>✏️</span> いまの ようすは どれかな？
-      </label>
-      <div id="noticeOptionsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-        <!-- JavaScriptで選択肢カードが生成されます -->
-      </div>
+    <!-- ★タブ切り替え（えらぶ か かくか） -->
+    <div class="w-full max-w-4xl mb-4 shrink-0 flex gap-2 md:gap-4 justify-center">
+      <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d flex-1 bg-green-500 text-white font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow">カードで えらぶ</button>
+      <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow">じぶんで かく</button>
     </div>
 
-    <div class="w-full max-w-2xl mb-6 md:mb-8 shrink-0 bg-blue-50 p-4 md:p-6 rounded-3xl border-4 border-blue-200 flex flex-col items-center shadow-inner">
+    <!-- カードでえらぶエリア -->
+    <div id="inputModeCard" class="w-full max-w-4xl mb-4 md:mb-6 shrink-0 bg-white p-4 md:p-6 rounded-3xl shadow-sm border-4 border-green-200">
+      <label class="block text-2xl md:text-3xl font-bold text-green-700 mb-4 flex justify-center items-center gap-2">
+        <span>✏️</span> いまの ようすは どっちかな？
+      </label>
+      <div class="flex items-stretch justify-center gap-2 md:gap-6 h-80 md:h-[26rem]">
+        <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-20 text-3xl md:text-4xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">◀</button>
+        <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-3 md:gap-6 flex-1 w-full max-w-3xl">
+          <!-- JavaScriptでカードが生成されます -->
+        </div>
+        <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-20 text-3xl md:text-4xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
+      </div>
+      <div id="noticePageIndicator" class="text-center mt-5 font-bold text-green-600 text-lg md:text-xl">1 / 3</div>
+    </div>
+
+    <!-- じぶんでかくエリア -->
+    <div id="inputModeText" class="w-full max-w-4xl mb-4 md:mb-6 shrink-0 bg-white p-4 md:p-6 rounded-3xl shadow-sm border-4 border-blue-200 hidden">
+      <label class="block text-2xl md:text-3xl font-bold text-blue-700 mb-4 flex justify-center items-center gap-2">
+        <span>✏️</span> きづいたこと を かいてみよう
+      </label>
+      <textarea id="noticeText" class="w-full rounded-2xl p-4 md:p-6 text-xl md:text-3xl border-4 border-gray-200 bg-gray-50 shadow-inner h-64 md:h-80 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
+    </div>
+
+    <div class="w-full max-w-4xl mb-6 md:mb-8 shrink-0 bg-blue-50 p-4 md:p-6 rounded-3xl border-4 border-blue-200 flex flex-col items-center shadow-inner">
       <h3 class="text-xl md:text-2xl font-bold text-blue-700 mb-3 md:mb-4 flex items-center gap-2">
         <span>💧</span> きょうは みずを あげたかな？
       </h3>
@@ -152,7 +207,7 @@
       </div>
     </div>
     
-    <div class="flex gap-4 md:gap-6 w-full max-w-2xl pb-8 shrink-0">
+    <div class="flex gap-4 md:gap-6 w-full max-w-4xl pb-8 shrink-0">
       <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2rem] p-4 md:p-6 text-2xl md:text-3xl font-bold flex-1">とりなおす</button>
       <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2rem] p-4 md:p-6 text-2xl md:text-3xl font-bold flex-1">きろくする</button>
     </div>
@@ -160,8 +215,10 @@
 
   <!-- 3. これまでの きろく をみる がめん（リスト） -->
   <div id="view-list" class="view hidden flex flex-col h-full w-full">
-    <div class="bg-red-500 text-white pt-10 md:pt-14 pb-4 md:pb-6 px-4 md:px-8 flex justify-between items-center shadow-md shrink-0 z-10 relative">
-      <button onclick="showView('home', 'back')" class="bg-red-600 px-4 md:px-6 py-3 md:py-4 rounded-2xl text-xl md:text-2xl font-bold active:bg-red-700 transition-colors">◀ もどる</button>
+    <div class="bg-theme-header text-white pt-10 md:pt-14 pb-4 md:pb-6 px-4 md:px-8 flex justify-between items-center shadow-md shrink-0 z-10 relative">
+      <button onclick="showView('home', 'back')" class="bg-theme-btn px-4 md:px-6 py-3 md:py-4 rounded-2xl text-xl md:text-2xl font-bold transition-colors">◀ もどる</button>
+      
+      <!-- 先生モード起動：タイトルを3秒長押し -->
       <h2 class="text-2xl md:text-4xl font-bold cursor-pointer" 
           ontouchstart="startSecretPress(event)" 
           ontouchend="cancelSecretPress(event)" 
@@ -170,13 +227,15 @@
           onmouseup="cancelSecretPress(event)" 
           onmouseleave="cancelSecretPress(event)" 
           style="touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">これまでの きろく</h2>
+          
       <div class="flex gap-4">
-        <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-3 md:px-4 py-2 md:py-3 rounded-xl text-lg md:text-xl font-bold active:bg-blue-700 transition-colors border-2 border-white shadow-sm flex flex-col items-center">
+        <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-3 md:px-4 py-2 md:py-3 rounded-xl text-lg md:text-xl font-bold transition-colors border-2 border-white shadow-sm flex flex-col items-center">
           <span>🖨️ ぜんぶ PDF ほぞん</span>
           <span class="text-xs md:text-sm">(せんせい用)</span>
         </button>
       </div>
     </div>
+    
     <div id="recordList" class="scrollable snap-container flex-1 p-4 md:p-8 flex flex-col gap-8 pb-16 md:pb-24 bg-gray-100">
       <!-- JavaScriptでここに記録が追加されます -->
     </div>
@@ -205,29 +264,64 @@
   </div>
 
   <script>
+    // ★ 3種類の野菜データと色設定
     const YASAI_DATA = {
-      'tomato': { name: 'トマト', icon: '🍅', color: 'text-red-500', bg: 'bg-red-50' }
+      'tomato': { name: 'トマト', icon: '🍅', pdfColor: '#ef4444' },
+      'nasu': { name: 'ナス', icon: '🍆', pdfColor: '#a855f7' },
+      'piman': { name: 'ピーマン', icon: '🫑', pdfColor: '#22c55e' }
     };
+
+    function setThemeColors(type) {
+      const root = document.documentElement;
+      if (type === 'tomato') {
+        root.style.setProperty('--theme-bg', '#fef2f2'); 
+        root.style.setProperty('--theme-text-dark', '#b91c1c'); 
+        root.style.setProperty('--theme-text-main', '#ef4444'); 
+        root.style.setProperty('--theme-border-light', '#fecaca'); 
+        root.style.setProperty('--theme-border-medium', '#f87171'); 
+        root.style.setProperty('--theme-border-main', '#ef4444'); 
+        root.style.setProperty('--theme-header-bg', '#ef4444'); 
+        root.style.setProperty('--theme-header-btn', '#dc2626'); 
+      } else if (type === 'nasu') {
+        root.style.setProperty('--theme-bg', '#faf5ff'); 
+        root.style.setProperty('--theme-text-dark', '#7e22ce'); 
+        root.style.setProperty('--theme-text-main', '#a855f7'); 
+        root.style.setProperty('--theme-border-light', '#e9d5ff'); 
+        root.style.setProperty('--theme-border-medium', '#c084fc'); 
+        root.style.setProperty('--theme-border-main', '#a855f7'); 
+        root.style.setProperty('--theme-header-bg', '#a855f7'); 
+        root.style.setProperty('--theme-header-btn', '#9333ea'); 
+      } else if (type === 'piman') {
+        root.style.setProperty('--theme-bg', '#f0fdf4'); 
+        root.style.setProperty('--theme-text-dark', '#15803d'); 
+        root.style.setProperty('--theme-text-main', '#22c55e'); 
+        root.style.setProperty('--theme-border-light', '#bbf7d0'); 
+        root.style.setProperty('--theme-border-medium', '#4ade80'); 
+        root.style.setProperty('--theme-border-main', '#22c55e'); 
+        root.style.setProperty('--theme-header-bg', '#22c55e'); 
+        root.style.setProperty('--theme-header-btn', '#16a34a'); 
+      }
+    }
 
     const WATERING_TITLES = [
       { min: 100, name: "✨ みずやり マイスター ✨ 🏆" },
-      { min: 97,  name: "でんせつの トマト マスター 🐉" },
-      { min: 92,  name: "トマトの かみさま ⛩️" },
+      { min: 97,  name: "でんせつの [YASAI] マスター 🐉" },
+      { min: 92,  name: "[YASAI]の かみさま ⛩️" },
       { min: 87,  name: "アルティメット みずやり 💎" },
-      { min: 82,  name: "だいうちゅうの トマトつかい 🚀" },
-      { min: 77,  name: "ゴッド オブ トマト 👼" },
+      { min: 82,  name: "だいうちゅうの [YASAI]つかい 🚀" },
+      { min: 77,  name: "ゴッド オブ [YASAI] 👼" },
       { min: 72,  name: "レジェンド オブ みずやり 🦄" },
-      { min: 67,  name: "トマト まじん 🧞" },
+      { min: 67,  name: "[YASAI] まじん 🧞" },
       { min: 62,  name: "ぎんがの みずやり だいおう 🌌" },
       { min: 57,  name: "みなみのしまの みずやりおう 🏝️" },
-      { min: 52,  name: "トマトの たいよう ☀️" },
+      { min: 52,  name: "[YASAI]の たいよう ☀️" },
       { min: 47,  name: "みずやり チャンピオン 🥇" },
       { min: 42,  name: "ミラクル みずやり プロ 🌈" },
       { min: 37,  name: "ウルトラ みずやり マスター 👑" },
       { min: 32,  name: "スーパー みずやり めいじん 🌟" },
-      { min: 27,  name: "トマトの まほうつかい 🪄" },
-      { min: 22,  name: "トマトの はかせ 🎓" },
-      { min: 17,  name: "トマトの おともだち 🤝" },
+      { min: 27,  name: "[YASAI]の まほうつかい 🪄" },
+      { min: 22,  name: "[YASAI]の はかせ 🎓" },
+      { min: 17,  name: "[YASAI]の おともだち 🤝" },
       { min: 12,  name: "みずやり キャプテン ⚓" },
       { min: 9,   name: "みずやり ヒーロー 🦸" },
       { min: 6,   name: "みずやり たんけんたい 🔎" },
@@ -235,15 +329,33 @@
       { min: 0,   name: "はじめての みずやり 🥚" }
     ];
 
-    // ★追加：気づいたことの選択肢データ
-    const NOTICE_OPTIONS = [
-      { icon: '🫘', title: 'たねまき', text: '小さな 茶いろの たねを つちに うえたよ。「おおきくなあれ」とおねがいしよう。' },
-      { icon: '🌱', title: 'めが でた！', text: 'ほそ長い はっぱが 2まい、ぴょこっと 顔をだしたよ。' },
-      { icon: '🌿', title: 'はっぱが ギザギザ', text: 'はっぱが ふえて、ギザギザの 形になったよ。トマトの においが するよ。' },
-      { icon: '🌼', title: '黄色の はな', text: '小さな 黄色の はなが さいたよ。この はなが ちると、実ができるんだ。' },
-      { icon: '🟢', title: '赤ちゃんの 実', text: 'はなの あとに、みどり色の ちっちゃな 玉が できたよ。まだ かたくて、ビー玉みたい。' },
-      { icon: '🍅', title: '実が 赤くなった！', text: 'みどり色から オレンジ色、そして 真っ赤 になったら、いよいよ しゅうかく！' }
-    ];
+    // ★ 選択した野菜ごとの観察文言
+    const NOTICE_OPTIONS = {
+      'tomato': [
+        { icon: '🫘', title: 'たねまき', text: 'ちいさな ちゃいろの たねを つちに うえたよ。「おおきくなあれ」と おねがい しよう。' },
+        { icon: '🌱', title: 'めが でた！', text: 'ほそながい はっぱが にまい、ぴょこっと かおを だしたよ。' },
+        { icon: '🌿', title: 'はっぱが ぎざぎざ', text: 'はっぱが ふえて、ぎざぎざの かたちに なったよ。とまとの においが するよ。' },
+        { icon: '🌼', title: 'きいろの はな', text: 'ちいさな きいろの はなが さいたよ。この はなが ちると、みが できるんだ。' },
+        { icon: '🟢', title: 'あかちゃんの み', text: 'はなの あとに、みどりいろの ちっちゃな たまが できたよ。まだ かたくて、びーだま みたい。' },
+        { icon: '🍅', title: 'みが あかくなった！', text: 'みどりいろ から おれんじいろ、そして まっか に なったら、いよいよ しゅうかく！' }
+      ],
+      'nasu': [
+        { icon: '🫘', title: 'たねまき', text: 'くろっぽくて ちいさな たねを うめたよ。やさしく つちを かぶせたよ。' },
+        { icon: '🌱', title: 'めが でた！', text: 'まるい はっぱが ２まい でたよ。くきが すこし むらさきいろ を しているよ。' },
+        { icon: '🌿', title: 'はっぱが おおきくなった', text: 'はっぱが どんどん ふえて、てのひら くらいの おおきさに なったよ。さわると すこし チクチク するよ。' },
+        { icon: '🌸', title: 'むらさきいろの はな', text: 'きれいな むらさきいろ の はなが さいたよ。はなの まんなかは きいろいよ。' },
+        { icon: '🍆', title: 'あかちゃんの み', text: 'はなが ちった あとに、ちいさな むらさきいろ の みが かおを だしたよ。つやつや 光っているよ。' },
+        { icon: '🍆', title: 'おおきな なすに なった！', text: 'みが ぐんぐん のびて、ずっしり おもくなったよ。はさみで ちょきんと しゅうかくしよう！' }
+      ],
+      'piman': [
+        { icon: '🫘', title: 'たねまき', text: 'しろっぽくて ひらべったい たねを うめたよ。はやく めが でると いいな。' },
+        { icon: '🌱', title: 'めが でた！', text: 'さきが つんとした みどりいろの はっぱが でたよ。とっても きれいな いろだよ。' },
+        { icon: '🌿', title: 'はっぱが つやつや', text: 'はっぱが たくさん ならんで、おひさまを あびて つやつや しているよ。くきが しっかり してきたよ。' },
+        { icon: '🌼', title: 'しろい はな', text: 'したを むいて、ちいさな しろい はなが さいたよ。とっても かわいい はなだよ。' },
+        { icon: '🟢', title: 'あかちゃんの み', text: 'はなが おちた ところに、ちっちゃな みどりいろ の ぴーまんが できたよ。まだ どんぐり くらいの おおきさだよ。' },
+        { icon: '🫑', title: 'ぴかぴかの ぴーまんに なった！', text: 'みが ふっくら ふくらんで、お店で 売っている ぴーまんに なったよ。たくさん とれたよ！' }
+      ]
+    };
 
     let currentImageData = null;
     let currentYasai = 'tomato';
@@ -252,7 +364,9 @@
     let videoStream = null;
     let currentCalendarDate = new Date();
     let isPreviewWatered = false;
-    let currentNoticeIndex = -1; // 選択されたカードのインデックス
+    let currentNoticeIndex = -1; 
+    let noticePage = 0; 
+    let currentInputMode = 'card'; // 'card' または 'text'
 
     let isTeacherMode = false;
     let secretPressTimer = null;
@@ -379,9 +493,10 @@
     document.addEventListener('DOMContentLoaded', function() {
       try {
         const savedName = localStorage.getItem('user_name');
+        const savedYasai = localStorage.getItem('yasai_type') || 'tomato';
         if (savedName) {
           currentUserName = savedName;
-          setYasaiMode('tomato');
+          setYasaiMode(savedYasai);
           renderCalendar();
           showView('home', false);
         } else {
@@ -396,8 +511,8 @@
       }
     });
 
-    function startApp() {
-      playSound('start'); 
+    function selectYasai(type) {
+      playSound('click');
       const nameInput = document.getElementById('userNameInput').value.trim();
       if (!nameInput) {
         document.getElementById('nameError').classList.remove('hidden');
@@ -405,20 +520,20 @@
       }
       document.getElementById('nameError').classList.add('hidden');
       localStorage.setItem('user_name', nameInput);
-      localStorage.setItem('yasai_type', 'tomato');
+      localStorage.setItem('yasai_type', type);
       currentUserName = nameInput;
-      setYasaiMode('tomato');
+      setYasaiMode(type);
+      playSound('start'); 
       renderCalendar();
       showView('home', false);
     }
 
     function setYasaiMode(type) {
       currentYasai = type;
+      setThemeColors(type);
       const data = YASAI_DATA[type];
       document.getElementById('homeIcon').innerText = data.icon;
       document.getElementById('homeTitle').innerHTML = `${currentUserName}さんの<br>${data.name}の きろく`;
-      document.getElementById('homeTitle').className = `text-3xl md:text-4xl font-bold text-center leading-snug ${data.color}`;
-      document.body.className = `h-screen w-screen flex flex-col items-center justify-center relative text-gray-800 ${data.bg}`;
     }
 
     function getTodayKey() {
@@ -442,7 +557,10 @@
         }
       }
       
-      document.getElementById('userTitle').innerText = currentTitle.name;
+      const yasaiName = YASAI_DATA[currentYasai].name;
+      const titleName = currentTitle.name.replace(/\[YASAI\]/g, yasaiName);
+      
+      document.getElementById('userTitle').innerText = titleName;
       const progressBar = document.getElementById('titleProgressBar');
       const hint = document.getElementById('nextTitleHint');
       
@@ -465,7 +583,7 @@
       
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = `
-        <div class="text-red-500 font-bold text-xs md:text-sm py-1 md:py-2">にち</div>
+        <div class="text-theme-main font-bold text-xs md:text-sm py-1 md:py-2">にち</div>
         <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">げつ</div>
         <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">か</div>
         <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">すい</div>
@@ -489,16 +607,16 @@
         const isWatered = wateringDays.includes(dateKey);
         const isToday = dateKey === todayStr;
         
-        cell.className = `calendar-cell flex flex-col items-center justify-start pt-0.5 md:pt-1 rounded-lg md:rounded-xl border-2 transition-colors ${isToday ? 'border-red-400 bg-red-50 shadow-inner' : 'border-gray-100 bg-white'}`;
+        cell.className = `calendar-cell flex flex-col items-center justify-start pt-0.5 md:pt-1 rounded-lg md:rounded-xl border-2 transition-colors ${isToday ? 'border-theme-medium bg-theme-bg shadow-inner' : 'border-gray-100 bg-white'}`;
         
         const dayText = document.createElement('div');
-        dayText.className = `text-xs md:text-sm font-bold ${isToday ? 'text-red-600' : 'text-gray-600'}`;
+        dayText.className = `text-xs md:text-sm font-bold ${isToday ? 'text-theme-dark' : 'text-gray-600'}`;
         dayText.innerText = d;
         cell.appendChild(dayText);
         
         const iconContainer = document.createElement('div');
         iconContainer.className = "flex-1 flex items-center justify-center text-xl md:text-3xl leading-none"; 
-        if (isWatered) iconContainer.innerText = "🍅";
+        if (isWatered) iconContainer.innerText = YASAI_DATA[currentYasai].icon;
         cell.appendChild(iconContainer);
         grid.appendChild(cell);
       }
@@ -570,8 +688,11 @@
       document.getElementById('previewImage').src = currentImageData;
       document.getElementById('previewDate').innerText = getTodayString();
       
-      // ★ 選択肢と水やりの初期化
+      // プレビューの初期化
+      switchInputMode('card');
       currentNoticeIndex = -1;
+      noticePage = 0;
+      document.getElementById('noticeText').value = '';
       renderNoticeOptions();
       initPreviewWatering();
       
@@ -579,34 +700,76 @@
       showView('preview', false);
     }
 
-    // ★ プレビュー画面の選択肢カードを描画
+    // ★ カード／テキスト入力の切り替え
+    function switchInputMode(mode) {
+      if(currentInputMode !== mode) playSound('click');
+      currentInputMode = mode;
+      const tabCardBtn = document.getElementById('tabCardBtn');
+      const tabTextBtn = document.getElementById('tabTextBtn');
+      const inputModeCard = document.getElementById('inputModeCard');
+      const inputModeText = document.getElementById('inputModeText');
+
+      if (mode === 'card') {
+        tabCardBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
+        tabTextBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
+        inputModeCard.classList.remove('hidden');
+        inputModeText.classList.add('hidden');
+      } else {
+        tabCardBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
+        tabTextBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
+        inputModeCard.classList.add('hidden');
+        inputModeText.classList.remove('hidden');
+      }
+    }
+
     function renderNoticeOptions() {
       const container = document.getElementById('noticeOptionsGrid');
       container.innerHTML = '';
       
-      NOTICE_OPTIONS.forEach((opt, index) => {
-        const isSelected = currentNoticeIndex === index;
+      const options = NOTICE_OPTIONS[currentYasai];
+      const totalPages = Math.ceil(options.length / 2);
+      const prevBtn = document.getElementById('prevNoticeBtn');
+      const nextBtn = document.getElementById('nextNoticeBtn');
+      prevBtn.disabled = noticePage === 0;
+      nextBtn.disabled = noticePage >= totalPages - 1;
+      
+      document.getElementById('noticePageIndicator').innerText = `${noticePage + 1} / ${totalPages}`;
+      
+      const startIndex = noticePage * 2;
+      const endIndex = Math.min(startIndex + 2, options.length);
+      
+      for (let i = startIndex; i < endIndex; i++) {
+        const opt = options[i];
+        const isSelected = currentNoticeIndex === i;
         const card = document.createElement('div');
-        card.className = `btn-3d cursor-pointer border-4 rounded-2xl p-3 md:p-4 flex gap-3 transition-all ${
+        card.className = `btn-3d cursor-pointer border-4 rounded-3xl p-3 md:p-6 flex flex-col items-center text-center transition-all ${
           isSelected 
-            ? 'border-blue-500 bg-blue-50 shadow-none transform translate-y-1' 
-            : 'border-gray-200 bg-white'
+            ? 'border-blue-500 bg-blue-50 shadow-none transform translate-y-2' 
+            : 'border-gray-200 bg-white hover:border-blue-300'
         }`;
         card.onclick = () => {
           playSound('click');
-          currentNoticeIndex = index;
+          currentNoticeIndex = i;
           renderNoticeOptions(); 
         };
         
         card.innerHTML = `
-          <div class="text-4xl md:text-5xl flex items-center justify-center shrink-0 w-16">${opt.icon}</div>
-          <div class="flex flex-col justify-center flex-1">
-            <div class="text-lg md:text-xl font-bold ${isSelected ? 'text-blue-700' : 'text-gray-800'} mb-1">${opt.title}</div>
-            <div class="text-xs md:text-sm ${isSelected ? 'text-blue-800 font-bold' : 'text-gray-600'} leading-relaxed">${opt.text}</div>
-          </div>
+          <div class="text-7xl md:text-[6rem] lg:text-[7rem] mb-2 md:mb-4 flex-shrink-0 pt-2">${opt.icon}</div>
+          <div class="text-xl md:text-3xl font-bold ${isSelected ? 'text-blue-700' : 'text-gray-800'} mb-2 md:mb-3">${opt.title}</div>
+          <div class="text-base md:text-xl ${isSelected ? 'text-blue-800 font-bold' : 'text-gray-600'} leading-relaxed overflow-y-auto px-1 md:px-2 pb-2">${opt.text}</div>
         `;
         container.appendChild(card);
-      });
+      }
+    }
+
+    function changeNoticePage(dir) {
+      playSound('click');
+      const options = NOTICE_OPTIONS[currentYasai];
+      const totalPages = Math.ceil(options.length / 2);
+      noticePage += dir;
+      if (noticePage < 0) noticePage = 0;
+      if (noticePage >= totalPages) noticePage = totalPages - 1;
+      renderNoticeOptions();
     }
 
     function initPreviewWatering() {
@@ -626,6 +789,8 @@
     function updatePreviewWateringUI() {
       const btn = document.getElementById('previewWaterBtn');
       const stamp = document.getElementById('previewWaterStamp');
+      stamp.innerText = YASAI_DATA[currentYasai].icon;
+
       if (isPreviewWatered) {
         btn.className = "bg-gray-300 text-gray-500 rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 pointer-events-none";
         btn.innerHTML = "✨ みずやり できたよ";
@@ -640,14 +805,20 @@
     function saveRecord() {
       if (!currentImageData) return;
 
-      // ★ 選択したカードの内容を文字列にして保存する
       let noticeText = '';
-      if (currentNoticeIndex >= 0) {
-        const opt = NOTICE_OPTIONS[currentNoticeIndex];
-        noticeText = `${opt.icon} ${opt.title}\n\n${opt.text}`;
+      if (currentInputMode === 'card') {
+        if (currentNoticeIndex >= 0) {
+          const opt = NOTICE_OPTIONS[currentYasai][currentNoticeIndex];
+          noticeText = `${opt.icon} ${opt.title}\n\n${opt.text}`;
+        } else {
+          showError('いまの ようすの カードを<br>どれか えらんでね！');
+          return;
+        }
       } else {
-        showError('いまの ようすの カードを<br>どれか えらんでね！');
-        return;
+        noticeText = document.getElementById('noticeText').value.trim();
+        if (!noticeText) {
+          noticeText = '（かいてないよ）';
+        }
       }
 
       const today = getTodayKey();
@@ -736,7 +907,7 @@
       const listContainer = document.getElementById('recordList');
       listContainer.innerHTML = '';
       let records = JSON.parse(localStorage.getItem('yasai_records')) || [];
-      const currentData = YASAI_DATA['tomato'];
+      const currentData = YASAI_DATA[currentYasai];
       
       if (records.length === 0) {
         listContainer.innerHTML = `
@@ -753,7 +924,7 @@
 
       records.forEach((record) => {
         const item = document.createElement('div');
-        item.className = 'snap-item bg-white p-4 md:p-6 shadow-2xl flex flex-col lg:flex-row border-4 border-red-300 rounded-[2rem] w-full max-w-6xl mx-auto h-auto min-h-[70vh] shrink-0 gap-4 md:gap-6';
+        item.className = 'snap-item bg-white p-4 md:p-6 shadow-2xl flex flex-col lg:flex-row border-4 border-theme-medium rounded-[2rem] w-full max-w-6xl mx-auto h-auto min-h-[70vh] shrink-0 gap-4 md:gap-6';
         
         const leftCol = document.createElement('div');
         leftCol.className = 'w-full lg:w-3/5 h-72 sm:h-96 lg:h-auto lg:min-h-[60vh] flex items-center justify-center bg-gray-100 border-4 border-gray-300 rounded-2xl overflow-hidden shrink-0 shadow-inner relative';
@@ -766,9 +937,9 @@
         rightCol.className = 'w-full lg:w-2/5 flex flex-col flex-1 gap-4 shrink-0';
         
         const dateDiv = document.createElement('div');
-        dateDiv.className = 'w-full text-center pb-4 border-b-4 border-red-500 flex flex-col items-center shrink-0';
+        dateDiv.className = 'w-full text-center pb-4 border-b-4 border-theme-main flex flex-col items-center shrink-0';
         
-        const iconToShow = '🍅';
+        const iconToShow = YASAI_DATA[record.yasai || currentYasai].icon;
         const recordName = record.userName || currentUserName;
         
         const waterBadge = record.watered 
@@ -782,7 +953,7 @@
         `;
 
         const pdfBtn = document.createElement('button');
-        pdfBtn.className = 'teacher-pdf-btn hidden btn-3d bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-2xl text-lg font-bold flex items-center gap-2 mt-4 transition-colors shadow';
+        pdfBtn.className = 'teacher-pdf-btn hidden btn-3d bg-theme-btn text-white px-5 py-3 rounded-2xl text-lg font-bold flex items-center gap-2 mt-4 transition-colors shadow';
         pdfBtn.innerHTML = '🖨️ このきろくを PDF ほぞん';
         pdfBtn.onclick = () => downloadPDF(record.id);
         dateDiv.appendChild(pdfBtn);
@@ -875,12 +1046,14 @@
 
       let targetRecords = records;
       let filename = '';
+      const yasaiName = YASAI_DATA[currentYasai].name;
+
       if (recordId !== null) {
         targetRecords = records.filter(r => r.id === recordId);
         const recordDate = new Date(recordId);
-        filename = `トマトのきろく_${getFormatDate(recordDate)}.pdf`;
+        filename = `${yasaiName}のきろく_${getFormatDate(recordDate)}.pdf`;
       } else {
-        filename = `トマトのきろく_ぜんぶ_${getFormatDate(new Date())}.pdf`;
+        filename = `${yasaiName}のきろく_ぜんぶ_${getFormatDate(new Date())}.pdf`;
       }
 
       document.getElementById('modal-error').classList.remove('hidden');
@@ -908,7 +1081,9 @@
         
         if (index !== sortedRecords.length - 1) page.style.pageBreakAfter = 'always';
 
-        const iconToShow = '🍅';
+        const recordYasaiData = YASAI_DATA[record.yasai || currentYasai];
+        const iconToShow = recordYasaiData.icon;
+        const pdfBorderColor = recordYasaiData.pdfColor;
         const recordName = record.userName || currentUserName;
 
         const waterText = record.watered ? '💧 このひは みずやり したよ！' : '（みずやりの きろく なし）';
@@ -920,7 +1095,7 @@
           <div style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 10px; color: #6b7280; font-family: sans-serif;">
             ${recordName}さんの
           </div>
-          <div style="font-size: 36px; font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 4px solid #ef4444; padding-bottom: 10px; font-family: sans-serif;">
+          <div style="font-size: 36px; font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 4px solid ${pdfBorderColor}; padding-bottom: 10px; font-family: sans-serif;">
             ${iconToShow} ${record.dateText} の きろく
           </div>
           <div style="display: flex; justify-content: center; margin-bottom: 25px;">
