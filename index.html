@@ -66,6 +66,20 @@
     /* PDF出力用スタイル */
     @media print {
       .no-print { display: none !important; }
+      #view-list { background-color: white !important; height: auto !important; overflow: visible !important; }
+      #recordList { background-color: white !important; padding: 0 !important; gap: 0 !important; }
+      .record-card { 
+        page-break-after: always; 
+        break-after: page; 
+        border: none !important; 
+        box-shadow: none !important; 
+        padding: 10mm !important;
+        height: 270mm !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .record-card img { max-height: 120mm !important; object-fit: contain !important; }
+      .pdf-hide { display: none !important; }
     }
   </style>
 </head>
@@ -197,12 +211,12 @@
     <div class="bg-theme-header text-white pt-10 pb-4 px-6 flex justify-between items-center shadow-md shrink-0 no-print">
       <button onclick="showView('home', 'back')" class="bg-theme-btn px-6 py-3 rounded-2xl text-xl font-bold">◀ もどる</button>
       <h2 class="text-2xl font-bold" ontouchstart="startPdfPress(event)" ontouchend="cancelPdfPress(event)">これまでの きろく</h2>
-      <div class="w-24 flex justify-end">
-        <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-4 py-2 rounded-xl text-sm font-bold border-2 border-white">せんせいボタン</button>
+      <div class="w-32 flex justify-end">
+        <button id="batchPdfBtn" onclick="showPdfOptionModal()" class="hidden btn-3d bg-blue-600 px-4 py-2 rounded-xl text-sm font-bold border-2 border-white">PDFで保存する</button>
       </div>
     </div>
     <!-- PDF印刷用ヘッダー -->
-    <div id="pdf-header" class="hidden p-8 border-b-4 border-gray-800">
+    <div id="pdf-header" class="hidden p-8 border-b-4 border-gray-800 bg-white">
       <h1 id="pdf-title" class="text-4xl font-bold mb-2"></h1>
       <p class="text-xl text-gray-600">かんさつにっき まとめ</p>
     </div>
@@ -222,7 +236,6 @@
     </div>
   </div>
 
-  <!-- 称号拡大用モーダル -->
   <div id="modal-rank-large" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onclick="this.classList.add('hidden')">
     <div class="bg-white rounded-[4rem] p-10 border-[12px] border-yellow-400 max-w-md w-full text-center shadow-2xl animate-pop-in" onclick="event.stopPropagation()">
       <div id="largeRankTitle" class="text-2xl font-bold text-orange-600 mb-6">いまの しょうごう</div>
@@ -243,6 +256,16 @@
     </div>
   </div>
 
+  <!-- PDF設定モーダル -->
+  <div id="modal-pdf-option" class="hidden fixed inset-0 bg-black/60 z-[120] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] p-8 flex flex-col gap-4 max-w-md w-full text-center shadow-2xl">
+      <h2 class="text-2xl font-bold mb-2">ほぞんする 設定</h2>
+      <button onclick="downloadPDF('all')" class="btn-3d bg-blue-600 text-white py-5 rounded-2xl text-xl font-bold">すべての観察日誌を保存する</button>
+      <button onclick="toggleIndividualMode()" class="btn-3d bg-green-500 text-white py-5 rounded-2xl text-xl font-bold">個別に保存する</button>
+      <button onclick="closePdfOptionModal()" class="btn-3d bg-gray-400 text-white py-4 rounded-2xl font-bold mt-2">やめる</button>
+    </div>
+  </div>
+
   <script>
     const YASAI_DATA = {
       'tomato': { name: 'トマト', img: 'images/tomato_main.png', pdfColor: '#ef4444' },
@@ -260,28 +283,28 @@
 
     const NOTICE_OPTIONS = {
       'tomato': [
-        { img: 'images/tomato_1.png', shortText: 'ちいさな なえ', text: 'ちいさな なえを つちに うえたよ。' },
-        { img: 'images/tomato_2.png', shortText: 'ぎざぎざ はっぱ', text: 'はっぱが ぎざぎざ してきたよ。' },
-        { img: 'images/tomato_3.png', shortText: 'きいろい はな', text: 'きいろい はなが きれいに さいたよ。' },
-        { img: 'images/tomato_4.png', shortText: 'みどりの み', text: 'ちいさな みどりの みが なったよ。' },
-        { img: 'images/tomato_5.png', shortText: 'オレンジの み', text: '実がだんだん オレンジいろに なってきたよ。' },
-        { img: 'images/tomato_6.png', shortText: 'あかい トマト', text: 'あかくて おいしそうな トマトになったよ！' }
+        { img: 'images/tomato_1.png', shortText: 'なえ', text: 'ちいさな なえを うえました。まだ ちいさいです。おおきくなると いいな。' },
+        { img: 'images/tomato_2.png', shortText: 'ギザギザのはっぱ', text: 'はっぱが おおきく なりました。よく みると、はっぱの まわりが ギザギザ しています。' },
+        { img: 'images/tomato_3.png', shortText: 'きいろいはな', text: 'きいろい はなが さきました。トマトの はなは きいろいんだね。' },
+        { img: 'images/tomato_4.png', shortText: 'あかちゃんの実', text: 'はなが さいた あとに、ちいさな みが できました。いろは まだ みどりいろ です。' },
+        { img: 'images/tomato_5.png', shortText: 'みどりの実', text: 'みどりいろの みが、ぐんぐん おおきく なりました。まるい かたちを しています。' },
+        { img: 'images/tomato_6.png', shortText: 'あかくなった実', text: 'みどりいろ だった みが、まっかに なりました。おいしそうな トマトの できあがりです。' }
       ],
       'nasu': [
-        { img: 'images/nasu_1.png', shortText: 'ちいさな なえ', text: 'なすの なえを つちに うえたよ。' },
-        { img: 'images/nasu_2.png', shortText: 'はっぱが おおきい', text: 'なすの はっぱが おおきく なったよ. ' },
-        { img: 'images/nasu_3.png', shortText: 'むらさきの はな', text: 'きれいな むらさきいろの はなが さいたよ。' },
-        { img: 'images/nasu_4.png', shortText: 'ちいさな なす', text: 'ちいさな むらさきの みが なったよ。' },
-        { img: 'images/nasu_5.png', shortText: 'ながい なす', text: 'なすが だんだん ながく なってきたよ。' },
-        { img: 'images/nasu_6.png', shortText: 'ぴかぴかの なす', text: 'ぴかぴか ひかる おおきな なすに なったよ！' }
+        { img: 'images/nasu_1.png', shortText: 'なえ', text: 'ナスの なえを うえました。よく みると、くきが すこし むらさきいろを しています。' },
+        { img: 'images/nasu_2.png', shortText: 'おおきいはっぱ', text: 'はっぱが とても おおきく なりました。さわると すこし ふさふさ しています。' },
+        { img: 'images/nasu_3.png', shortText: 'むらさきのはな', text: 'むらさきいろの はなが さきました。まん中に きいろい ところが あります。' },
+        { img: 'images/nasu_4.png', shortText: 'あかちゃんの実', text: 'はなの あとに、ちいさな ナスが できました。あかちゃん ナスも むらさきいろ です。' },
+        { img: 'images/nasu_5.png', shortText: 'おおきくなった実', text: 'ちいさかった ナスが、ながく おおきく なりました。つやつや しています。' },
+        { img: 'images/nasu_6.png', shortText: 'しゅうかく', text: 'とても おおきな ナスに なりました。もう しゅうかく できそうです。' }
       ],
       'piman': [
-        { img: 'images/piman_1.png', shortText: 'ちいさな なえ', text: 'ぴーまんの なえを つちに うえたよ。' },
-        { img: 'images/piman_2.png', shortText: 'ぴんと した はっぱ', text: 'はっぱが ぴんと げんきに なったよ。' },
-        { img: 'images/piman_3.png', shortText: 'しろい はな', text: 'ちいさな しろい はなが さいたよ。' },
-        { img: 'images/piman_4.png', shortText: 'ちいさな ぴーまん', text: 'ちいさな ぴーまんの 赤ちゃんが なったよ. ' },
-        { img: 'images/piman_5.md.png', shortText: 'ふくらんだ み', text: '実がぷっくり ふくらんできたよ。' },
-        { img: 'images/piman_6.png', shortText: 'つやつや ぴーまん', text: 'つやつやの みどりの ぴーまんが なったよ！' }
+        { img: 'images/piman_1.png', shortText: 'なえ', text: 'ピーマンの なえを うえました。はっぱの さきが すこし とがっています。' },
+        { img: 'images/piman_2.png', shortText: 'つやつやのはっぱ', text: 'はっぱの かずが たくさん ふえました。みどりいろで つやつや しています。' },
+        { img: 'images/piman_3.png', shortText: 'しろいはな', text: 'しろい はなが さきました。ピーマンの はなは しろくて かわいいね。' },
+        { img: 'images/piman_4.png', shortText: 'あかちゃんの実', text: 'はなの あとに、ちいさな みが できました。もう ピーマンの かたちを しています。' },
+        { img: 'images/piman_5.png', shortText: 'おおきくなった実', text: 'ピーマンが おおきく なりました。さわると つるつる しています。' },
+        { img: 'images/piman_6.png', shortText: 'ぴかぴかピーマン', text: 'ぴかぴかの ピーマンが できました。りっぱに そだって うれしいな。' }
       ]
     };
 
@@ -296,6 +319,7 @@
     let resetTimer = null;
     let pdfBtnTimer = null;
     let audioCtx = null;
+    let isIndividualPdfMode = false;
 
     function playSound(type) {
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -349,7 +373,7 @@
       document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
       document.getElementById('view-'+name).classList.remove('hidden');
       if(name === 'home') { renderWeeklyCalendar(); updateStatus(); }
-      if(name === 'list') renderList();
+      if(name === 'list') { isIndividualPdfMode = false; renderList(); }
     }
 
     function renderWeeklyCalendar() {
@@ -395,7 +419,6 @@
       let rank = WATERING_TITLES[WATERING_TITLES.length - 1];
       for(let r of WATERING_TITLES) { if(count >= r.min) { rank = r; break; } }
       const rankName = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
-      
       document.getElementById('largeRankImg').src = rank.img;
       document.getElementById('largeRankName').innerText = rankName;
       document.getElementById('modal-rank-large').classList.remove('hidden');
@@ -534,15 +557,22 @@
       const container = document.getElementById('recordList');
       container.innerHTML = '';
       const records = JSON.parse(localStorage.getItem('yasai_records') || '[]');
-      records.reverse().forEach(r => {
+      records.reverse().forEach((r, idx) => {
         const div = document.createElement('div');
-        div.className = "bg-white rounded-[2.5rem] p-5 md:p-8 border-4 border-theme-light shadow-md flex flex-col gap-5";
+        div.className = `record-card bg-white rounded-[2.5rem] p-5 md:p-8 border-4 border-theme-light shadow-md flex flex-col gap-5 ${isIndividualPdfMode ? 'border-blue-400' : ''}`;
+        div.id = `record-${r.id}`;
+        
+        let headerHtml = `<div class="text-2xl md:text-3xl font-bold text-theme-dark border-b-4 border-theme-bg pb-2 flex justify-between items-center">
+          <span>${r.dateStr}</span>
+          ${isIndividualPdfMode ? `<button onclick="downloadPDF('single', '${r.id}')" class="bg-blue-600 text-white text-xs px-3 py-2 rounded-full no-print">この1枚を保存</button>` : ''}
+        </div>`;
+        
         div.innerHTML = `
-          <div class="text-2xl md:text-3xl font-bold text-theme-dark border-b-4 border-theme-bg pb-2">${r.dateStr}</div>
-          <div class="w-full bg-gray-50 rounded-3xl overflow-hidden border-2 border-gray-100 shadow-inner">
-            <img src="${r.image}" class="w-full h-auto object-contain">
+          ${headerHtml}
+          <div class="w-full bg-gray-50 rounded-3xl overflow-hidden border-2 border-gray-100 shadow-inner flex items-center justify-center">
+            <img src="${r.image}" class="max-w-full h-auto object-contain">
           </div>
-          <div class="bg-white p-4 md:p-6 rounded-3xl border-4 border-theme-bg shadow-sm">
+          <div class="bg-white p-4 md:p-6 rounded-3xl border-4 border-theme-bg shadow-sm mt-auto">
             ${r.notice}
           </div>
         `;
@@ -553,30 +583,68 @@
     function startResetPress() { resetTimer = setTimeout(() => { document.getElementById('modal-reset').classList.remove('hidden'); playSound('click'); }, 3000); }
     function cancelResetPress() { clearTimeout(resetTimer); }
     
-    function startPdfPress() { pdfBtnTimer = setTimeout(() => { document.getElementById('batchPdfBtn').classList.remove('hidden'); playSound('click'); }, 3000); }
+    function startPdfPress() { 
+      pdfBtnTimer = setTimeout(() => { 
+        const btn = document.getElementById('batchPdfBtn');
+        btn.classList.toggle('hidden');
+        playSound('click'); 
+      }, 3000); 
+    }
     function cancelPdfPress() { clearTimeout(pdfBtnTimer); }
 
     function executeClear() { localStorage.clear(); location.reload(); }
     function goToSelectView() { localStorage.removeItem('user_name'); location.reload(); }
 
-    function downloadPDF() {
+    function showPdfOptionModal() {
+      document.getElementById('modal-pdf-option').classList.remove('hidden');
+      playSound('click');
+    }
+
+    function closePdfOptionModal() {
+      document.getElementById('modal-pdf-option').classList.add('hidden');
+    }
+
+    function toggleIndividualMode() {
+      isIndividualPdfMode = !isIndividualPdfMode;
+      closePdfOptionModal();
+      renderList();
+      playSound('click');
+    }
+
+    function downloadPDF(mode, recordId) {
       const element = document.getElementById('view-list');
       const header = document.getElementById('pdf-header');
       const pdfTitle = document.getElementById('pdf-title');
+      const allCards = document.querySelectorAll('.record-card');
+      
+      closePdfOptionModal();
       
       pdfTitle.innerText = `${currentUserName}さんの ${YASAI_DATA[currentYasai].name}の きろく`;
       header.classList.remove('hidden');
+
+      // 個別保存の場合は、対象以外を隠す
+      if(mode === 'single') {
+        allCards.forEach(card => {
+          if(card.id !== `record-${recordId}`) card.classList.add('pdf-hide');
+        });
+      }
       
+      const filename = mode === 'all' 
+        ? `${currentUserName}_${YASAI_DATA[currentYasai].name}_すべてのきろく.pdf`
+        : `${currentUserName}_${YASAI_DATA[currentYasai].name}_かんさつきろく.pdf`;
+
       const opt = {
-        margin: 10,
-        filename: `${currentUserName}_${YASAI_DATA[currentYasai].name}_きろく.pdf`,
+        margin: 0,
+        filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
       };
 
       html2pdf().set(opt).from(element).save().then(() => {
         header.classList.add('hidden');
+        allCards.forEach(card => card.classList.remove('pdf-hide'));
       });
     }
   </script>
