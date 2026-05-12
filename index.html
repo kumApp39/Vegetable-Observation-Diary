@@ -6,13 +6,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="やさいかんさつ">
-  <link rel="apple-touch-icon" href="./icon.png?v=4">
-  <link rel="icon" type="image/png" href="./icon.png?v=4">
+  <link rel="apple-touch-icon" href="./icon.png?v=5">
+  <link rel="icon" type="image/png" href="./icon.png?v=5">
   <title>やさい かんさつ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    /* 野菜ごとに色を動的に変えるためのCSS変数 */
     :root {
       --theme-bg: #fef2f2;
       --theme-text-dark: #b91c1c;
@@ -64,6 +63,10 @@
       scroll-snap-align: start;
       scroll-margin-top: 1rem;
     }
+    /* 画像が読み込まれない時のプレースホルダー */
+    img {
+      color: transparent;
+    }
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col items-center justify-center relative text-gray-800 bg-theme-bg">
@@ -79,15 +82,21 @@
     <h1 class="text-3xl md:text-4xl font-bold text-gray-700 mb-6 text-center leading-relaxed shrink-0">どの やさい を<br>そだてる？</h1>
     <div class="flex flex-col md:flex-row justify-center gap-4 w-full max-w-4xl shrink-0 px-2 pb-10">
       <button onclick="selectYasai('tomato')" class="btn-3d bg-red-400 hover:bg-red-500 text-white rounded-[2rem] md:rounded-[3rem] py-6 md:py-8 px-4 flex flex-col items-center justify-center gap-4 flex-1">
-        <span class="text-7xl md:text-8xl transform hover:scale-110 transition-transform">🍅</span>
+        <div class="w-24 h-24 md:w-32 md:h-32 transform hover:scale-110 transition-transform">
+          <img src="images/tomato_main.png" alt="トマト" class="w-full h-full object-contain drop-shadow-lg">
+        </div>
         <span class="text-2xl md:text-4xl font-bold">トマト</span>
       </button>
       <button onclick="selectYasai('nasu')" class="btn-3d bg-purple-400 hover:bg-purple-500 text-white rounded-[2rem] md:rounded-[3rem] py-6 md:py-8 px-4 flex flex-col items-center justify-center gap-4 flex-1">
-        <span class="text-7xl md:text-8xl transform hover:scale-110 transition-transform">🍆</span>
+        <div class="w-24 h-24 md:w-32 md:h-32 transform hover:scale-110 transition-transform">
+          <img src="images/nasu_main.png" alt="ナス" class="w-full h-full object-contain drop-shadow-lg">
+        </div>
         <span class="text-2xl md:text-4xl font-bold">ナス</span>
       </button>
       <button onclick="selectYasai('piman')" class="btn-3d bg-green-400 hover:bg-green-500 text-white rounded-[2rem] md:rounded-[3rem] py-6 md:py-8 px-4 flex flex-col items-center justify-center gap-4 flex-1">
-        <span class="text-7xl md:text-8xl transform hover:scale-110 transition-transform">🫑</span>
+        <div class="w-24 h-24 md:w-32 md:h-32 transform hover:scale-110 transition-transform">
+          <img src="images/piman_main.png" alt="ピーマン" class="w-full h-full object-contain drop-shadow-lg">
+        </div>
         <span class="text-2xl md:text-4xl font-bold">ピーマン</span>
       </button>
     </div>
@@ -96,7 +105,7 @@
   <!-- 1. さいしょの がめん（ホーム） -->
   <div id="view-home" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 pt-10 md:pt-16 pb-8 md:pb-12 box-border">
     <div class="flex items-center gap-3 mb-2 md:mb-4 shrink-0">
-      <div id="homeIcon" class="text-5xl md:text-6xl">🍅</div>
+      <img id="homeIconImg" src="" alt="やさい" class="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-md">
       <h1 id="homeTitle" class="text-2xl md:text-4xl font-bold text-theme-dark">やさいの きろく</h1>
     </div>
     
@@ -202,8 +211,9 @@
       <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="btn-3d bg-blue-500 text-white rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 transition-all">
         みずを あげたよ！
       </button>
-      <div id="previewWaterStamp" class="hidden mt-4 text-5xl md:text-6xl animate-bounce">
-        🍅
+      <div id="previewWaterStamp" class="hidden mt-4 animate-bounce">
+        <!-- みずやりスタンプ用画像 -->
+        <img id="previewWaterStampImg" src="" class="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-md">
       </div>
     </div>
     
@@ -264,11 +274,11 @@
   </div>
 
   <script>
-    // ★ 3種類の野菜データと色設定
+    // ★ 絵文字から、あなたが用意する画像のファイルパス（images/〇〇.png）に変更しました。
     const YASAI_DATA = {
-      'tomato': { name: 'トマト', icon: '🍅', pdfColor: '#ef4444' },
-      'nasu': { name: 'ナス', icon: '🍆', pdfColor: '#a855f7' },
-      'piman': { name: 'ピーマン', icon: '🫑', pdfColor: '#22c55e' }
+      'tomato': { name: 'トマト', img: 'images/tomato_main.png', pdfColor: '#ef4444' },
+      'nasu': { name: 'ナス', img: 'images/nasu_main.png', pdfColor: '#a855f7' },
+      'piman': { name: 'ピーマン', img: 'images/piman_main.png', pdfColor: '#22c55e' }
     };
 
     function setThemeColors(type) {
@@ -329,31 +339,31 @@
       { min: 0,   name: "はじめての みずやり 🥚" }
     ];
 
-    // ★ 選択した野菜ごとの観察文言
+    // ★ 観察カードのイラストをあなたが用意する画像パスに置き換えました
     const NOTICE_OPTIONS = {
       'tomato': [
-        { icon: '🌱', title: 'なえうえ', text: 'ちいさな なえを つちに うえたよ。「おおきくなあれ」と おねがい しよう。' },
-        { icon: '🌿', title: 'はっぱが ぎざぎざ', text: 'はっぱが ふえて、ぎざぎざの かたちに なったよ。とまとの においが するよ。' },
-        { icon: '🌼', title: 'きいろの はな', text: 'ちいさな きいろの はなが さいたよ。この はなが ちると、みが できるんだ。' },
-        { icon: '🫒', title: 'あかちゃんの み', text: 'はなの あとに、みどりいろの ちっちゃな たまが できたよ。まだ かたくて、びーだま みたい。' },
-        { icon: '🟢', title: 'みが おおきくなった', text: 'みどりいろの みが、だんだん おおきく なってきたよ。あかくなるのが たのしみだな。' },
-        { icon: '🍅', title: 'みが あかくなった！', text: 'みどりいろ から おれんじいろ、そして まっか に なったら、いよいよ しゅうかく！' }
+        { img: 'images/tomato_1.png', title: 'なえうえ', text: 'ちいさな なえを つちに うえたよ。「おおきくなあれ」と おねがい しよう。' },
+        { img: 'images/tomato_2.png', title: 'はっぱが ぎざぎざ', text: 'はっぱが ふえて、ぎざぎざの かたちに なったよ。とまとの においが するよ。' },
+        { img: 'images/tomato_3.png', title: 'きいろの はな', text: 'ちいさな きいろの はなが さいたよ。この はなが ちると、みが できるんだ。' },
+        { img: 'images/tomato_4.png', title: 'あかちゃんの み', text: 'はなの あとに、みどりいろの ちっちゃな たまが できたよ。まだ かたくて、びーだま みたい。' },
+        { img: 'images/tomato_5.png', title: 'みが おおきくなった', text: 'みどりいろの みが、だんだん おおきく なってきたよ。あかくなるのが たのしみだな。' },
+        { img: 'images/tomato_6.png', title: 'みが あかくなった！', text: 'みどりいろ から おれんじいろ、そして まっか に なったら、いよいよ しゅうかく！' }
       ],
       'nasu': [
-        { icon: '🌱', title: 'なえうえ', text: 'ちいさな なえを つちに うえたよ。やさしく つちを かぶせたよ。' },
-        { icon: '🌿', title: 'はっぱが おおきくなった', text: 'はっぱが どんどん ふえて、てのひら くらいの おおきさに なったよ。さわると すこし ちくちく するよ。' },
-        { icon: '🪻', title: 'むらさきいろの はな', text: 'きれいな むらさきいろ の はなが さいたよ。はなの まんなかは きいろいよ。' },
-        { icon: '🟣', title: 'あかちゃんの み', text: 'はなが ちった あとに、ちいさな むらさきいろ の みが かおを だしたよ。つやつや ひかっているよ。' },
-        { icon: '🍆', title: 'みが おおきくなった', text: 'みが ぐんぐん のびて、ずっしり おもくなったよ。' },
-        { icon: '🧺', title: 'おおきな なすに なった！', text: 'はさみで ちょきんと しゅうかく しよう！ぴかぴかの なす だよ。' }
+        { img: 'images/nasu_1.png', title: 'なえうえ', text: 'ちいさな なえを つちに うえたよ。やさしく つちを かぶせたよ。' },
+        { img: 'images/nasu_2.png', title: 'はっぱが おおきくなった', text: 'はっぱが どんどん ふえて、てのひら くらいの おおきさに なったよ。さわると すこし ちくちく するよ。' },
+        { img: 'images/nasu_3.png', title: 'むらさきいろの はな', text: 'きれいな むらさきいろ の はなが さいたよ。はなの まんなかは きいろいよ。' },
+        { img: 'images/nasu_4.png', title: 'あかちゃんの み', text: 'はなが ちった あとに、ちいさな むらさきいろ の みが かおを だしたよ。つやつや ひかっているよ。' },
+        { img: 'images/nasu_5.png', title: 'みが おおきくなった', text: 'みが ぐんぐん のびて、ずっしり おもくなったよ。' },
+        { img: 'images/nasu_6.png', title: 'おおきな なすに なった！', text: 'はさみで ちょきんと しゅうかく しよう！ぴかぴかの なす だよ。' }
       ],
       'piman': [
-        { icon: '🌱', title: 'なえうえ', text: 'ちいさな なえを つちに うえたよ。はやく おおきく なると いいな。' },
-        { icon: '🌿', title: 'はっぱが つやつや', text: 'はっぱが たくさん ならんで、おひさまを あびて つやつや しているよ。くきが しっかり してきたよ。' },
-        { icon: '🌼', title: 'しろい はな', text: 'したを むいて、ちいさな しろい はなが さいたよ。とっても かわいい はな だよ。' },
-        { icon: '🫒', title: 'あかちゃんの み', text: 'はなが おちた ところに、ちっちゃな みどりいろ の ぴーまんが できたよ。まだ どんぐり くらいの おおきさ だよ。' },
-        { icon: '🟢', title: 'みが おおきくなった', text: 'みが ふっくら ふくらんで、すこしずつ ぴーまんの かたちに なってきたよ。' },
-        { icon: '🫑', title: 'ぴかぴかの ぴーまんに なった！', text: 'おみせで うっている ぴーまんに なったよ。たくさん とれたよ！' }
+        { img: 'images/piman_1.png', title: 'なえうえ', text: 'ちいさな なえを つちに うえたよ。はやく おおきく なると いいな。' },
+        { img: 'images/piman_2.png', title: 'はっぱが つやつや', text: 'はっぱが たくさん ならんで、おひさまを あびて つやつや しているよ。くきが しっかり してきたよ。' },
+        { img: 'images/piman_3.png', title: 'しろい はな', text: 'したを むいて、ちいさな しろい はなが さいたよ。とっても かわいい はな だよ。' },
+        { img: 'images/piman_4.png', title: 'あかちゃんの み', text: 'はなが おちた ところに、ちっちゃな みどりいろ の ぴーまんが できたよ。まだ どんぐり くらいの おおきさ だよ。' },
+        { img: 'images/piman_5.png', title: 'みが おおきくなった', text: 'みが ふっくら ふくらんで、すこしずつ ぴーまんの かたちに なってきたよ。' },
+        { img: 'images/piman_6.png', title: 'ぴかぴかの ぴーまんに なった！', text: 'おみせで うっている ぴーまんに なったよ。たくさん とれたよ！' }
       ]
     };
 
@@ -366,7 +376,7 @@
     let isPreviewWatered = false;
     let currentNoticeIndex = -1; 
     let noticePage = 0; 
-    let currentInputMode = 'card'; // 'card' または 'text'
+    let currentInputMode = 'card';
 
     let isTeacherMode = false;
     let secretPressTimer = null;
@@ -532,7 +542,10 @@
       currentYasai = type;
       setThemeColors(type);
       const data = YASAI_DATA[type];
-      document.getElementById('homeIcon').innerText = data.icon;
+      
+      // ★ 絵文字の代わりに画像タグを設定
+      document.getElementById('homeIconImg').src = data.img;
+      
       document.getElementById('homeTitle').innerHTML = `${currentUserName}さんの<br>${data.name}の きろく`;
     }
 
@@ -615,8 +628,13 @@
         cell.appendChild(dayText);
         
         const iconContainer = document.createElement('div');
-        iconContainer.className = "flex-1 flex items-center justify-center text-xl md:text-3xl leading-none"; 
-        if (isWatered) iconContainer.innerText = YASAI_DATA[currentYasai].icon;
+        iconContainer.className = "flex-1 flex items-center justify-center p-1"; 
+        
+        // ★ スタンプを画像に変更
+        if (isWatered) {
+          iconContainer.innerHTML = `<img src="${YASAI_DATA[currentYasai].img}" alt="スタンプ" class="w-full h-full object-contain">`;
+        }
+        
         cell.appendChild(iconContainer);
         grid.appendChild(cell);
       }
@@ -688,7 +706,6 @@
       document.getElementById('previewImage').src = currentImageData;
       document.getElementById('previewDate').innerText = getTodayString();
       
-      // プレビューの初期化
       switchInputMode('card');
       currentNoticeIndex = -1;
       noticePage = 0;
@@ -700,7 +717,6 @@
       showView('preview', false);
     }
 
-    // ★ カード／テキスト入力の切り替え
     function switchInputMode(mode) {
       if(currentInputMode !== mode) playSound('click');
       currentInputMode = mode;
@@ -753,8 +769,11 @@
           renderNoticeOptions(); 
         };
         
+        // ★ 観察カードのイラストを画像タグに変更
         card.innerHTML = `
-          <div class="text-7xl md:text-[6rem] lg:text-[7rem] mb-2 md:mb-4 flex-shrink-0 pt-2">${opt.icon}</div>
+          <div class="w-24 h-24 md:w-32 md:h-32 mb-2 md:mb-4 flex-shrink-0 pt-2">
+            <img src="${opt.img}" alt="${opt.title}" class="w-full h-full object-contain drop-shadow">
+          </div>
           <div class="text-xl md:text-3xl font-bold ${isSelected ? 'text-blue-700' : 'text-gray-800'} mb-2 md:mb-3">${opt.title}</div>
           <div class="text-base md:text-xl ${isSelected ? 'text-blue-800 font-bold' : 'text-gray-600'} leading-relaxed overflow-y-auto px-1 md:px-2 pb-2">${opt.text}</div>
         `;
@@ -788,37 +807,56 @@
 
     function updatePreviewWateringUI() {
       const btn = document.getElementById('previewWaterBtn');
-      const stamp = document.getElementById('previewWaterStamp');
-      stamp.innerText = YASAI_DATA[currentYasai].icon;
+      const stampContainer = document.getElementById('previewWaterStamp');
+      const stampImg = document.getElementById('previewWaterStampImg');
+      
+      stampImg.src = YASAI_DATA[currentYasai].img; // 画像ソースをセット
 
       if (isPreviewWatered) {
         btn.className = "bg-gray-300 text-gray-500 rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 pointer-events-none";
         btn.innerHTML = "✨ みずやり できたよ";
-        stamp.classList.remove('hidden');
+        stampContainer.classList.remove('hidden');
       } else {
         btn.className = "btn-3d bg-blue-500 text-white rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 active:bg-blue-600";
         btn.innerHTML = "💧 みずを あげたよ！";
-        stamp.classList.add('hidden');
+        stampContainer.classList.add('hidden');
       }
     }
 
     function saveRecord() {
       if (!currentImageData) return;
 
-      let noticeText = '';
+      let noticeHtmlForList = ''; // リスト表示用のHTML
+      let noticeHtmlForPdf = ''; // PDF用のHTML
+
       if (currentInputMode === 'card') {
         if (currentNoticeIndex >= 0) {
           const opt = NOTICE_OPTIONS[currentYasai][currentNoticeIndex];
-          noticeText = `${opt.icon} ${opt.title}\n\n${opt.text}`;
+          // ★ 記録リストやPDFには、選択した画像のパスも一緒に保存しておく
+          noticeHtmlForList = `
+            <div class="flex flex-col items-center">
+              <img src="${opt.img}" class="w-20 h-20 md:w-24 md:h-24 mb-3 object-contain">
+              <div class="font-bold text-2xl md:text-3xl mb-2">${opt.title}</div>
+              <div class="text-xl md:text-2xl">${opt.text}</div>
+            </div>
+          `;
+          // PDF表示時は高さを固定して崩れないようにする
+          noticeHtmlForPdf = `
+            <div style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+              <img src="${opt.img}" style="height: 100px; object-fit: contain; margin-bottom: 15px;">
+              <div style="font-weight:bold; font-size: 28px; margin-bottom: 10px;">${opt.title}</div>
+              <div style="font-size: 24px;">${opt.text}</div>
+            </div>
+          `;
         } else {
           showError('いまの ようすの カードを<br>どれか えらんでね！');
           return;
         }
       } else {
-        noticeText = document.getElementById('noticeText').value.trim();
-        if (!noticeText) {
-          noticeText = '（かいてないよ）';
-        }
+        const text = document.getElementById('noticeText').value.trim();
+        const safeText = text || '（かいてないよ）';
+        noticeHtmlForList = `<div class="whitespace-pre-wrap">${safeText}</div>`;
+        noticeHtmlForPdf = `<div style="white-space: pre-wrap;">${safeText}</div>`;
       }
 
       const today = getTodayKey();
@@ -849,7 +887,8 @@
         id: Date.now(),
         dateText: getTodayString(),
         image: currentImageData,
-        notice: noticeText, 
+        noticeListHtml: noticeHtmlForList, // リスト表示用HTML
+        noticePdfHtml: noticeHtmlForPdf,   // PDF出力用HTML
         yasai: currentYasai,
         userName: currentUserName,
         watered: isPreviewWatered 
@@ -912,7 +951,7 @@
       if (records.length === 0) {
         listContainer.innerHTML = `
           <div class="flex flex-col items-center justify-center h-full text-gray-500 mt-10 md:mt-20">
-            <div class="text-6xl md:text-7xl mb-6">${currentData.icon}</div>
+            <div class="w-32 h-32 md:w-40 md:h-40 mb-6"><img src="${currentData.img}" class="w-full h-full object-contain"></div>
             <div class="text-2xl md:text-3xl font-bold mb-4">まだ きろくが ないよ</div>
             <div class="text-xl md:text-2xl">しゃしんを とってみよう！</div>
           </div>
@@ -939,7 +978,8 @@
         const dateDiv = document.createElement('div');
         dateDiv.className = 'w-full text-center pb-4 border-b-4 border-theme-main flex flex-col items-center shrink-0';
         
-        const iconToShow = YASAI_DATA[record.yasai || currentYasai].icon;
+        // ★ リスト画面でも画像を表示
+        const recordYasaiData = YASAI_DATA[record.yasai || currentYasai];
         const recordName = record.userName || currentUserName;
         
         const waterBadge = record.watered 
@@ -948,7 +988,10 @@
         
         dateDiv.innerHTML = `
           <div class="text-lg md:text-xl text-gray-500 font-bold mb-1">${recordName}さんの</div>
-          <div class="text-3xl md:text-4xl font-bold text-gray-800 flex justify-center items-center gap-2"><span>${iconToShow}</span> ${record.dateText}</div>
+          <div class="text-3xl md:text-4xl font-bold text-gray-800 flex justify-center items-center gap-3">
+            <img src="${recordYasaiData.img}" class="w-10 h-10 md:w-12 md:h-12 object-contain">
+            ${record.dateText}
+          </div>
           <div>${waterBadge}</div>
         `;
 
@@ -965,8 +1008,9 @@
         noticeLabel.innerHTML = '✏️ きづいたこと';
         
         const noticeText = document.createElement('div');
-        noticeText.className = 'text-lg md:text-2xl text-gray-800 grow overflow-y-auto whitespace-pre-wrap leading-relaxed font-medium';
-        noticeText.textContent = record.notice || '（かいてないよ）';
+        noticeText.className = 'text-lg md:text-2xl text-gray-800 grow overflow-y-auto leading-relaxed font-medium';
+        // ★ HTMLとして描画（自由入力かカード選択画像が表示される）
+        noticeText.innerHTML = record.noticeListHtml || record.notice || '（かいてないよ）';
         
         noticeContainer.appendChild(noticeLabel);
         noticeContainer.appendChild(noticeText);
@@ -1082,7 +1126,6 @@
         if (index !== sortedRecords.length - 1) page.style.pageBreakAfter = 'always';
 
         const recordYasaiData = YASAI_DATA[record.yasai || currentYasai];
-        const iconToShow = recordYasaiData.icon;
         const pdfBorderColor = recordYasaiData.pdfColor;
         const recordName = record.userName || currentUserName;
 
@@ -1095,8 +1138,9 @@
           <div style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 10px; color: #6b7280; font-family: sans-serif;">
             ${recordName}さんの
           </div>
-          <div style="font-size: 36px; font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 4px solid ${pdfBorderColor}; padding-bottom: 10px; font-family: sans-serif;">
-            ${iconToShow} ${record.dateText} の きろく
+          <div style="font-size: 36px; font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 4px solid ${pdfBorderColor}; padding-bottom: 10px; font-family: sans-serif; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <img src="${recordYasaiData.img}" style="height: 40px; object-fit: contain;">
+            ${record.dateText} の きろく
           </div>
           <div style="display: flex; justify-content: center; margin-bottom: 25px;">
             <div style="background-color: ${waterBg}; color: ${waterColor}; border: ${waterBorder}; font-size: 20px; font-weight: bold; padding: 10px 24px; border-radius: 99px; font-family: sans-serif;">
@@ -1110,7 +1154,9 @@
             <div style="font-size: 24px; font-weight: bold; color: #1d4ed8; margin-bottom: 15px; font-family: sans-serif;">
               ✏️ きづいたこと
             </div>
-            <div style="font-size: 24px; line-height: 1.6; white-space: pre-wrap; font-family: sans-serif; flex: 1; font-weight: bold;">${record.notice || '（かいてないよ）'}</div>
+            <div style="font-size: 24px; line-height: 1.6; font-family: sans-serif; flex: 1; font-weight: bold;">
+              ${record.noticePdfHtml || record.notice || '（かいてないよ）'}
+            </div>
           </div>
         `;
         pdfContainer.appendChild(page);
