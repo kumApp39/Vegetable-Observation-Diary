@@ -6,11 +6,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="やさいかんさつ">
-  <link rel="apple-touch-icon" href="./icon.png?v=6">
-  <link rel="icon" type="image/png" href="./icon.png?v=6">
+  <link rel="apple-touch-icon" href="./icon.png?v=5">
+  <link rel="icon" type="image/png" href="./icon.png?v=5">
   <title>やさい かんさつ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- ★ 紙吹雪アニメーション用のライブラリを追加 -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --theme-bg: #fef2f2;
@@ -65,6 +67,23 @@
     }
     img {
       color: transparent;
+    }
+
+    /* ★ 称号アニメーション用のCSS */
+    @keyframes popIn {
+      0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
+      70% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .animate-pop-in {
+      animation: popIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spinSlow 10s linear infinite;
     }
   </style>
 </head>
@@ -125,9 +144,15 @@
             あつめた スタンプ： <span id="totalStampCount" class="text-3xl md:text-4xl text-theme-main mx-1">0</span> こ
           </div>
           
-          <div class="bg-white px-4 py-2 rounded-xl w-full border-2 border-yellow-200 text-center z-10 mb-1.5">
-            <div class="text-xs md:text-sm text-gray-500 font-bold mb-0.5">👑 いまの しょうごう</div>
-            <div id="userTitle" class="text-lg md:text-2xl font-bold text-orange-500">はじめての みずやり 🥚</div>
+          <!-- ★ 現在の称号表示部分をイラスト付きに変更 -->
+          <div class="bg-white px-4 py-2 rounded-xl w-full border-2 border-yellow-200 flex items-center justify-center gap-3 z-10 mb-1.5">
+            <div class="w-12 h-12 md:w-14 md:h-14 bg-yellow-50 rounded-full border-2 border-yellow-300 p-1 flex-shrink-0 flex items-center justify-center">
+               <img id="currentRankImg" src="" class="w-full h-full object-contain">
+            </div>
+            <div class="text-left">
+              <div class="text-xs md:text-sm text-gray-500 font-bold mb-0.5">👑 いまの しょうごう</div>
+              <div id="userTitle" class="text-lg md:text-xl font-bold text-orange-500"></div>
+            </div>
           </div>
           
           <div class="w-full bg-yellow-200 rounded-full h-3 mt-1 overflow-hidden relative z-10">
@@ -265,7 +290,6 @@
     <div id="errorTitle" class="text-3xl md:text-4xl text-red-500 font-bold mb-6 md:mb-8">おかしいな？</div>
     <div class="text-2xl md:text-3xl text-gray-700 mb-10 md:mb-12 leading-relaxed" id="errorMsg">せんせいを よんでね</div>
     <div id="errorButtons" class="flex gap-4 w-full max-w-md">
-      <!-- ★「もどる」ボタンに変更 -->
       <button onclick="document.getElementById('modal-error').classList.add('hidden')" class="btn-3d bg-blue-400 text-white text-2xl md:text-3xl px-6 py-5 md:py-6 rounded-3xl font-bold flex-1">もどる</button>
       <button onclick="showConfirm()" id="clearBtn" class="hidden btn-3d bg-red-400 text-white text-2xl md:text-3xl px-6 py-5 md:py-6 rounded-3xl font-bold flex-1">きろくを けす</button>
     </div>
@@ -294,6 +318,33 @@
       </div>
 
       <button onclick="closeResetConfirm()" class="btn-3d bg-gray-400 text-white text-xl md:text-2xl py-4 rounded-3xl font-bold w-full max-w-xs">やめる</button>
+    </div>
+  </div>
+
+  <!-- ★ 新しい称号お祝いアニメーション用モーダル -->
+  <div id="modal-levelup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm">
+    <div class="bg-white rounded-[3rem] p-8 border-[10px] border-yellow-400 max-w-sm w-full text-center relative overflow-hidden shadow-2xl">
+      <!-- 背景の光 -->
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+      
+      <div class="relative z-10">
+        <div class="flex justify-center gap-2 text-yellow-500 mb-2 text-3xl">✨⭐✨</div>
+        <p class="text-xl font-bold text-gray-500 mb-1">おめでとう！！</p>
+        <h2 class="text-3xl font-bold text-orange-600 mb-6">しょうごう ゲット！</h2>
+        
+        <div class="w-48 h-48 mx-auto mb-6 relative">
+          <!-- 後光のアニメーション -->
+          <div class="absolute inset-0 border-8 border-yellow-300 border-dashed rounded-full opacity-50 animate-spin-slow"></div>
+          <!-- イラストが飛び出すアニメーション -->
+          <div class="absolute inset-0 flex items-center justify-center bg-yellow-50 rounded-full shadow-inner animate-pop-in border-4 border-white overflow-hidden">
+            <img id="modalRankImg" src="" class="w-32 h-32 object-contain">
+          </div>
+        </div>
+        
+        <h3 id="modalRankName" class="text-2xl md:text-3xl font-bold text-blue-700 mb-8 leading-tight">---</h3>
+        
+        <button onclick="closeLevelUpModal()" class="w-full btn-3d bg-red-500 hover:bg-red-600 text-white text-2xl font-bold py-4 rounded-full shadow-md">ありがとう！</button>
+      </div>
     </div>
   </div>
 
@@ -336,30 +387,22 @@
       }
     }
 
+    // ★ 称号データを指定いただいた内容と画像パスに更新しました
     const WATERING_TITLES = [
-      { min: 100, name: "✨ みずやり マイスター ✨ 🏆" },
-      { min: 97,  name: "でんせつの [YASAI] マスター 🐉" },
-      { min: 92,  name: "[YASAI]の かみさま ⛩️" },
-      { min: 87,  name: "アルティメット みずやり 💎" },
-      { min: 82,  name: "だいうちゅうの [YASAI]つかい 🚀" },
-      { min: 77,  name: "ゴッド オブ [YASAI] 👼" },
-      { min: 72,  name: "レジェンド オブ みずやり 🦄" },
-      { min: 67,  name: "[YASAI] まじん 🧞" },
-      { min: 62,  name: "ぎんがの みずやり だいおう 🌌" },
-      { min: 57,  name: "みなみのしまの みずやりおう 🏝️" },
-      { min: 52,  name: "[YASAI]の たいよう ☀️" },
-      { min: 47,  name: "みずやり チャンピオン 🥇" },
-      { min: 42,  name: "ミラクル みずやり プロ 🌈" },
-      { min: 37,  name: "ウルトラ みずやり マスター 👑" },
-      { min: 32,  name: "スーパー みずやり めいじん 🌟" },
-      { min: 27,  name: "[YASAI]の まほうつかい 🪄" },
-      { min: 22,  name: "[YASAI]の はかせ 🎓" },
-      { min: 17,  name: "[YASAI]の おともだち 🤝" },
-      { min: 12,  name: "みずやり キャプテン ⚓" },
-      { min: 9,   name: "みずやり ヒーロー 🦸" },
-      { min: 6,   name: "みずやり たんけんたい 🔎" },
-      { min: 3,   name: "みずやり 1ねんせい 🌱" },
-      { min: 0,   name: "はじめての みずやり 🥚" }
+      { min: 100, name: "でんせつの ガーディアン", img: "images/rank_13.png" },
+      { min: 80,  name: "たいようの おうじ", img: "images/rank_12.png" },
+      { min: 60,  name: "チャンピオン", img: "images/rank_11.png" },
+      { min: 50,  name: "ミラクル プロ", img: "images/rank_10.png" },
+      { min: 40,  name: "ウルトラ マスター", img: "images/rank_9.png" },
+      { min: 35,  name: "スーパー めいじん", img: "images/rank_8.png" },
+      { min: 30,  name: "まほうつかい", img: "images/rank_7.png" },
+      { min: 25,  name: "[YASAI] はかせ", img: "images/rank_6.png" },
+      { min: 20,  name: "[YASAI]の おともだち", img: "images/rank_5.png" },
+      { min: 15,  name: "みずやり キャプテン", img: "images/rank_4.png" },
+      { min: 10,  name: "みずやり ヒーロー", img: "images/rank_3.png" },
+      { min: 6,   name: "みずやり たんけんたい", img: "images/rank_2.png" },
+      { min: 3,   name: "みずやり 1ねんせい", img: "images/rank_1.png" },
+      { min: 0,   name: "はじめての みずやり", img: "images/rank_0.png" }
     ];
 
     const NOTICE_OPTIONS = {
@@ -526,7 +569,6 @@
         } else {
           showView('select', false);
         }
-        // ★アプリ起動時のカメラ事前リクエストを削除しました。
       } catch (e) {
         document.getElementById('view-select').classList.remove('hidden');
       }
@@ -600,6 +642,9 @@
       const titleName = currentTitle.name.replace(/\[YASAI\]/g, yasaiName);
       
       document.getElementById('userTitle').innerText = titleName;
+      // ★ 現在の称号の画像をセット
+      document.getElementById('currentRankImg').src = currentTitle.img;
+      
       const progressBar = document.getElementById('titleProgressBar');
       const hint = document.getElementById('nextTitleHint');
       
@@ -834,7 +879,6 @@
       const stampContainer = document.getElementById('previewWaterStamp');
       const stampImg = document.getElementById('previewWaterStampImg');
       
-      // ★ ここでも「じょうろ」の画像を共通で使用します
       stampImg.src = 'images/water_stamp.png'; 
 
       if (isPreviewWatered) {
@@ -846,6 +890,14 @@
         btn.innerHTML = "💧 みずを あげたよ！";
         stampContainer.classList.add('hidden');
       }
+    }
+
+    // ★ モーダルを閉じてホーム画面に戻る処理
+    function closeLevelUpModal() {
+      playSound('click');
+      document.getElementById('modal-levelup').classList.add('hidden');
+      showView('home', false); 
+      currentImageData = null;
     }
 
     function saveRecord() {
@@ -886,15 +938,18 @@
       let wateringDays = JSON.parse(localStorage.getItem('watering_days')) || [];
       
       let isLevelUp = false;
+      let levelUpRank = null;
 
       if (isPreviewWatered && !wateringDays.includes(today)) {
         wateringDays.push(today);
         localStorage.setItem('watering_days', JSON.stringify(wateringDays));
         
         const newCount = wateringDays.length;
+        // ★ 称号がアップしたかチェックする
         for (let i = 0; i < WATERING_TITLES.length; i++) {
           if (newCount === WATERING_TITLES[i].min && newCount > 0) {
             isLevelUp = true;
+            levelUpRank = WATERING_TITLES[i];
             break;
           }
         }
@@ -924,30 +979,43 @@
         
         const modal = document.getElementById('modal-success');
         
-        if (isLevelUp) {
-          modal.innerHTML = `
-            <div class="bg-white rounded-[3rem] p-10 md:p-12 flex flex-col items-center transform transition-transform animate-bounce border-8 border-yellow-400 max-w-lg w-full mx-4 text-center">
-              <div class="text-8xl md:text-9xl mb-4 md:mb-6">👑</div>
-              <div class="text-3xl md:text-4xl font-bold text-orange-500 mb-2">しょうごう が あがったよ！</div>
-              <div class="text-2xl md:text-3xl text-gray-600">きろくも できたよ！</div>
-            </div>
-          `;
+        // ★ レベルアップした場合は新しいお祝いアニメーションモーダルを出す
+        if (isLevelUp && levelUpRank) {
+          const yasaiName = YASAI_DATA[currentYasai].name;
+          document.getElementById('modalRankImg').src = levelUpRank.img;
+          document.getElementById('modalRankName').innerText = levelUpRank.name.replace(/\[YASAI\]/g, yasaiName);
+          document.getElementById('modal-levelup').classList.remove('hidden');
+          
+          // 紙吹雪を飛ばす
+          const duration = 3 * 1000;
+          const animationEnd = Date.now() + duration;
+          const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 110 };
+
+          function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+          const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+            const particleCount = 50 * (timeLeft / duration);
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+          }, 250);
+
         } else {
+          // いつもの「きろくしたよ」モーダル
           modal.innerHTML = `
             <div class="bg-white rounded-[3rem] p-10 md:p-12 flex flex-col items-center transform transition-transform animate-bounce max-w-sm w-full mx-4">
               <div class="text-8xl md:text-9xl mb-4 md:mb-6">💮</div>
               <div class="text-4xl md:text-5xl font-bold text-red-500">きろく したよ！</div>
             </div>
           `;
+          modal.classList.remove('hidden');
+          setTimeout(() => {
+            modal.classList.add('hidden');
+            showView('home', false); 
+            currentImageData = null;
+          }, 2500);
         }
-
-        modal.classList.remove('hidden');
-        
-        setTimeout(() => {
-          modal.classList.add('hidden');
-          showView('home', false); 
-          currentImageData = null;
-        }, 2500);
 
       } catch (e) {
         if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
@@ -1074,7 +1142,6 @@
       }
     }
 
-    // ★ 先生用リセットメニューの関数
     function startResetPress(e) {
       cancelResetPress(); 
       resetPressTimer = setTimeout(() => {
