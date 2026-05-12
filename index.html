@@ -57,13 +57,6 @@
     .calendar-cell {
       aspect-ratio: 1 / 1;
     }
-    .snap-container {
-      scroll-snap-type: y mandatory;
-    }
-    .snap-item {
-      scroll-snap-align: start;
-      scroll-margin-top: 1rem;
-    }
     img {
       color: transparent;
     }
@@ -119,66 +112,65 @@
   </div>
 
   <!-- 1. さいしょの がめん（ホーム） -->
-  <div id="view-home" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 pt-10 md:pt-16 pb-8 md:pb-12 box-border">
-    <div class="flex items-center gap-3 mb-2 md:mb-4 shrink-0 cursor-pointer"
-         ontouchstart="startResetPress(event)" 
-         ontouchend="cancelResetPress(event)" 
-         ontouchcancel="cancelResetPress(event)" 
-         onmousedown="startResetPress(event)" 
-         onmouseup="cancelResetPress(event)" 
-         onmouseleave="cancelResetPress(event)" 
-         style="touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
-      <img id="homeIconImg" src="" alt="やさい" class="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-md pointer-events-none">
-      <h1 id="homeTitle" class="text-2xl md:text-4xl font-bold text-theme-dark pointer-events-none">やさいの きろく</h1>
+  <div id="view-home" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 py-6 md:py-10 box-border">
+    <div class="flex items-center gap-3 mb-4 shrink-0 cursor-pointer"
+         ontouchstart="startResetPress(event)" ontouchend="cancelResetPress(event)" ontouchcancel="cancelResetPress(event)" 
+         onmousedown="startResetPress(event)" onmouseup="cancelResetPress(event)" onmouseleave="cancelResetPress(event)">
+      <img id="homeIconImg" src="" alt="やさい" class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-md pointer-events-none">
+      <h1 id="homeTitle" class="text-3xl md:text-5xl font-bold text-theme-dark pointer-events-none leading-tight"></h1>
     </div>
     
-    <div class="flex flex-col md:flex-row gap-3 w-full max-w-5xl flex-1 min-h-0">
-      <div class="flex flex-col gap-3 flex-1 min-h-0">
-        <div class="bg-yellow-50 rounded-2xl p-3 md:p-4 border-4 border-yellow-300 shadow-sm shrink-0 flex flex-col items-center relative overflow-hidden">
-          <div class="absolute -top-4 -right-4 text-5xl opacity-20">✨</div>
-          <div class="absolute -bottom-4 -left-4 text-5xl opacity-20">🌟</div>
+    <div class="flex flex-col md:flex-row gap-4 w-full max-w-5xl flex-1 min-h-0">
+      
+      <!-- 左側：ステータス＆カレンダー -->
+      <div class="flex flex-col gap-4 flex-1 min-h-0">
+        
+        <!-- 大きなステータスエリア -->
+        <div class="bg-yellow-50 rounded-[2.5rem] p-6 md:p-8 border-4 border-yellow-300 shadow-sm flex flex-col items-center justify-center flex-1 relative overflow-hidden min-h-0">
+          <div class="absolute top-2 right-2 text-6xl opacity-20">✨</div>
+          <div class="absolute bottom-2 left-2 text-6xl opacity-20">🌟</div>
           
-          <div class="text-base md:text-lg font-bold text-yellow-800 mb-1.5 z-10 flex items-center gap-2">
-            <img src="images/water_stamp.png" alt="じょうろ" class="w-6 h-6 md:w-8 md:h-8 object-contain">
-            あつめた スタンプ： <span id="totalStampCount" class="text-3xl md:text-4xl text-theme-main mx-1">0</span> こ
+          <div class="text-xl md:text-3xl font-bold text-yellow-800 mb-4 flex items-center justify-center gap-2 z-10 w-full">
+            <img src="images/water_stamp.png" alt="じょうろ" class="w-10 h-10 md:w-14 md:h-14 object-contain">
+            あつめた スタンプ <span id="totalStampCount" class="text-5xl md:text-7xl text-theme-main mx-2 tracking-tighter">0</span> こ
           </div>
           
-          <div class="bg-white px-4 py-2 rounded-xl w-full border-2 border-yellow-200 flex items-center justify-center gap-3 z-10 mb-1.5">
-            <div class="w-12 h-12 md:w-14 md:h-14 bg-yellow-50 rounded-full border-2 border-yellow-300 p-1 flex-shrink-0 flex items-center justify-center">
+          <div class="bg-white px-6 py-4 rounded-3xl w-full max-w-sm border-4 border-yellow-200 flex items-center justify-center gap-4 z-10 mb-4 shadow-inner">
+            <div class="w-20 h-20 md:w-24 md:h-24 bg-yellow-50 rounded-full border-4 border-yellow-300 p-2 flex-shrink-0 flex items-center justify-center">
                <img id="currentRankImg" src="" class="w-full h-full object-contain">
             </div>
-            <div class="text-left">
-              <div class="text-xs md:text-sm text-gray-500 font-bold mb-0.5">👑 いまの しょうごう</div>
-              <div id="userTitle" class="text-lg md:text-xl font-bold text-orange-500"></div>
+            <div class="text-left flex-1">
+              <div class="text-sm md:text-base text-gray-500 font-bold mb-1">👑 いまの しょうごう</div>
+              <div id="userTitle" class="text-xl md:text-2xl font-bold text-orange-500 leading-tight"></div>
             </div>
           </div>
           
-          <div class="w-full bg-yellow-200 rounded-full h-3 mt-1 overflow-hidden relative z-10">
+          <div class="w-full max-w-sm bg-yellow-200 rounded-full h-6 mt-2 overflow-hidden border-2 border-yellow-300 z-10">
             <div id="titleProgressBar" class="bg-orange-400 h-full transition-all duration-1000 ease-out" style="width: 0%"></div>
           </div>
-          <div id="nextTitleHint" class="text-xs md:text-sm font-bold text-yellow-700 mt-1 z-10">つぎの しょうごう まで あと 3こ！</div>
+          <div id="nextTitleHint" class="text-base md:text-lg font-bold text-yellow-700 mt-3 z-10"></div>
         </div>
 
-        <div class="bg-white rounded-2xl p-2 md:p-4 border-4 border-theme-light shadow-sm flex flex-col flex-1 min-h-0">
-          <div class="flex justify-between items-center mb-1 md:mb-2 bg-theme-bg rounded-xl p-1 md:p-2 shrink-0">
-            <button onclick="changeMonth(-1)" class="btn-3d bg-white text-theme-main rounded-full w-10 h-10 md:w-12 md:h-12 text-lg md:text-xl font-bold flex items-center justify-center shadow">◀</button>
-            <h2 id="calendarTitle" class="text-lg md:text-2xl font-bold text-theme-dark">〇がつ</h2>
-            <button onclick="changeMonth(1)" class="btn-3d bg-white text-theme-main rounded-full w-10 h-10 md:w-12 md:h-12 text-lg md:text-xl font-bold flex items-center justify-center shadow">▶</button>
+        <!-- 1週間カレンダー -->
+        <div class="bg-white rounded-3xl p-3 md:p-5 border-4 border-theme-light shadow-sm shrink-0 flex flex-col">
+          <div class="flex justify-between items-center mb-3 bg-theme-bg rounded-2xl p-2 md:p-3 shrink-0">
+            <button onclick="changeWeek(-1)" class="btn-3d bg-white text-theme-main rounded-xl px-4 py-2 text-lg md:text-xl font-bold shadow">◀ 先しゅう</button>
+            <h2 id="calendarTitle" class="text-xl md:text-3xl font-bold text-theme-dark">〇がつ</h2>
+            <button onclick="changeWeek(1)" class="btn-3d bg-white text-theme-main rounded-xl px-4 py-2 text-lg md:text-xl font-bold shadow">次しゅう ▶</button>
           </div>
-          <div class="flex-1 overflow-y-auto">
-            <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center w-full pb-1">
-            </div>
-          </div>
+          <!-- 1行7日分 -->
+          <div id="calendarGrid" class="grid grid-cols-7 gap-2 text-center h-20 md:h-28"></div>
         </div>
       </div>
 
-      <div class="flex flex-col gap-4 w-full md:w-80 shrink-0 justify-center pb-2 md:pb-0">
-        <button onclick="startCamera()" class="btn-3d bg-orange-400 text-white rounded-[2rem] p-6 md:p-8 text-2xl md:text-3xl font-bold flex flex-col items-center justify-center gap-3">
-          <span class="text-6xl md:text-7xl">📷</span>
+      <!-- 右側：大きなボタン -->
+      <div class="flex flex-row md:flex-col gap-4 w-full md:w-80 shrink-0 justify-center">
+        <button onclick="startCamera()" class="btn-3d bg-orange-400 text-white rounded-[3rem] p-6 text-2xl md:text-4xl font-bold flex flex-col items-center justify-center gap-4 flex-1 shadow-lg h-40 md:h-auto">
+          <span class="text-6xl md:text-[6rem]">📷</span>
           <span>しゃしんをとる</span>
         </button>
-        <button onclick="showView('list', 'list')" class="btn-3d bg-green-500 text-white rounded-[2rem] p-6 md:p-8 text-2xl md:text-3xl font-bold flex flex-col items-center justify-center gap-3">
-          <span class="text-6xl md:text-7xl">📖</span>
+        <button onclick="showView('list', 'list')" class="btn-3d bg-green-500 text-white rounded-[3rem] p-6 text-2xl md:text-4xl font-bold flex flex-col items-center justify-center gap-4 flex-1 shadow-lg h-40 md:h-auto">
+          <span class="text-6xl md:text-[6rem]">📖</span>
           <span>これまでのきろく</span>
         </button>
       </div>
@@ -197,65 +189,65 @@
   </div>
 
   <!-- 2. しゃしんを かくにんする がめん（プレビュー） -->
-  <div id="view-preview" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 py-4 md:py-6 box-border overflow-hidden gap-2 md:gap-3">
+  <div id="view-preview" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 py-4 md:py-6 box-border overflow-hidden gap-3">
     
-    <h2 class="text-xl md:text-3xl font-bold text-blue-700 shrink-0" id="previewDate">〇がつ〇にち</h2>
+    <!-- ★ ヘッダー（日付とタブボタンを同じ行に配置） -->
+    <div class="w-full max-w-5xl flex justify-between items-center shrink-0 px-2">
+      <h2 class="text-2xl md:text-4xl font-bold text-blue-700" id="previewDate">〇がつ〇にち</h2>
+      <div class="flex gap-2">
+        <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d px-3 md:px-6 py-2 md:py-3 bg-green-500 text-white font-bold rounded-xl md:rounded-2xl text-sm md:text-xl transition-colors shadow z-10">カードで えらぶ</button>
+        <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d px-3 md:px-6 py-2 md:py-3 bg-gray-200 text-gray-600 font-bold rounded-xl md:rounded-2xl text-sm md:text-xl transition-colors shadow z-0">じぶんで かく</button>
+      </div>
+    </div>
     
-    <!-- ★ 画像プレビュー（高さを抑えて固定し、下のスペースを空ける） -->
-    <div class="w-full max-w-4xl h-24 md:h-40 shrink-0 bg-white rounded-2xl shadow-inner flex items-center justify-center overflow-hidden border-4 border-gray-200 p-2">
-      <img id="previewImage" src="" alt="とったしゃしん" class="max-w-full max-h-full object-contain rounded-xl">
+    <!-- ★ 画像プレビュー（縦幅を小さく固定） -->
+    <div class="w-full max-w-5xl h-32 md:h-48 shrink-0 bg-gray-100 rounded-3xl shadow-inner flex items-center justify-center overflow-hidden border-4 border-gray-300 p-2">
+      <img id="previewImage" src="" alt="とったしゃしん" class="max-w-full max-h-full object-contain rounded-2xl">
     </div>
 
-    <!-- タブ切り替え (shrink-0) -->
-    <div class="w-full max-w-4xl shrink-0 flex gap-2 md:gap-4 justify-center">
-      <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d flex-1 bg-green-500 text-white font-bold py-2 md:py-3 rounded-2xl text-base md:text-xl transition-colors shadow">カードで えらぶ</button>
-      <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-2 md:py-3 rounded-2xl text-base md:text-xl transition-colors shadow">じぶんで かく</button>
-    </div>
-
-    <!-- ★ 入力エリアコンテナ（flex-1 で画面の余ったスペースを全部使って大きく広がるように設定） -->
-    <div class="w-full max-w-4xl flex-1 flex flex-col min-h-0">
+    <!-- ★ 入力エリアと水やりボタン（残りスペースを全部使って大きく） -->
+    <div class="w-full max-w-5xl flex-1 flex gap-3 md:gap-6 min-h-0">
       
-      <!-- カードでえらぶエリア -->
-      <div id="inputModeCard" class="bg-white p-2 md:p-4 rounded-3xl shadow-sm border-4 border-green-200 flex flex-col h-full min-h-0">
-        <label class="block text-sm md:text-xl font-bold text-green-700 mb-1 flex justify-center items-center gap-1 shrink-0">
-          <span>✏️</span> いまの ようすは どっちかな？
-        </label>
-        
-        <div class="flex items-stretch justify-center gap-2 md:gap-4 w-full flex-1 min-h-0">
-          <!-- 矢印ボタンも高さ一杯に -->
-          <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-xl w-12 md:w-16 h-full text-2xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">◀</button>
-          
-          <!-- カードを並べるグリッド -->
-          <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-2 md:gap-4 flex-1 w-full max-w-3xl h-full min-h-0">
-            <!-- JavaScriptでカードが生成されます -->
+      <!-- 左カラム：カードでえらぶ / じぶんでかく (大きく広がる) -->
+      <div class="flex-[5] flex flex-col relative h-full min-h-0">
+        <!-- カードエリア -->
+        <div id="inputModeCard" class="absolute inset-0 bg-white p-2 md:p-4 rounded-3xl shadow-sm border-4 border-green-200 flex flex-col">
+          <label class="block text-sm md:text-xl font-bold text-green-700 mb-1 flex justify-center items-center gap-2 shrink-0">
+            <span>✏️</span> いまの ようすは どっちかな？
+          </label>
+          <div class="flex items-center justify-center gap-2 md:gap-4 w-full flex-1 min-h-0">
+            <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-16 h-full text-2xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">◀</button>
+            <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-2 md:gap-4 flex-1 w-full h-full min-h-0">
+              <!-- JSでカード生成 -->
+            </div>
+            <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-16 h-full text-2xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
           </div>
-          
-          <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-xl w-12 md:w-16 h-full text-2xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
         </div>
-        <div id="noticePageIndicator" class="text-center mt-2 font-bold text-green-600 text-xs md:text-lg shrink-0">1 / 3</div>
+
+        <!-- テキストエリア -->
+        <div id="inputModeText" class="hidden absolute inset-0 bg-white p-2 md:p-4 rounded-3xl shadow-sm border-4 border-blue-200 flex flex-col">
+          <label class="block text-sm md:text-xl font-bold text-blue-700 mb-1 flex justify-center items-center gap-2 shrink-0">
+            <span>✏️</span> きづいたこと を かいてみよう
+          </label>
+          <textarea id="noticeText" class="w-full rounded-2xl p-4 text-xl md:text-3xl border-4 border-gray-200 bg-gray-50 shadow-inner flex-1 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
+        </div>
       </div>
 
-      <!-- じぶんでかくエリア -->
-      <div id="inputModeText" class="hidden bg-white p-2 md:p-4 rounded-3xl shadow-sm border-4 border-blue-200 flex flex-col h-full min-h-0">
-        <label class="block text-sm md:text-xl font-bold text-blue-700 mb-1 flex justify-center items-center gap-1 shrink-0">
-          <span>✏️</span> きづいたこと を かいてみよう
-        </label>
-        <textarea id="noticeText" class="w-full rounded-xl p-3 text-lg md:text-2xl border-4 border-gray-200 bg-gray-50 shadow-inner flex-1 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
+      <!-- 右カラム：水やりボタン（大きく四角いボタンに） -->
+      <div class="flex-[3] bg-blue-50 p-3 md:p-5 rounded-3xl border-4 border-blue-200 flex flex-col items-center justify-center shadow-inner h-full min-h-0">
+        <h3 class="text-sm md:text-xl font-bold text-blue-800 flex items-center justify-center gap-2 mb-3 shrink-0 text-center w-full">
+          <img src="images/water_stamp.png" class="w-6 h-6 md:w-8 md:h-8 object-contain" alt="じょうろ">
+          みずをあげたかな？
+        </h3>
+        <!-- 大きな四角いボタン -->
+        <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="w-full flex-1 min-h-0"></button>
       </div>
-    </div>
-
-    <!-- ★ 水やりボタン（大きなひとつのボタンに変更し、サイズをしっかり確保） -->
-    <div class="w-full max-w-4xl shrink-0 mt-1">
-      <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="btn-3d w-full bg-blue-500 hover:bg-blue-600 border-4 border-blue-600 text-white rounded-[2rem] p-3 md:p-5 flex items-center justify-center gap-4 transition-all active:translate-y-2">
-        <img src="images/water_stamp.png" class="w-10 h-10 md:w-14 md:h-14 object-contain drop-shadow-md" alt="じょうろ">
-        <span class="text-xl md:text-3xl font-bold">💧 みずを あげる！</span>
-      </button>
     </div>
     
-    <!-- ★ 保存ボタン（大きく押しやすいサイズに確保） -->
-    <div class="flex gap-3 md:gap-6 w-full max-w-4xl shrink-0 mt-1">
-      <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2rem] p-3 md:p-5 text-lg md:text-2xl font-bold flex-1">とりなおす</button>
-      <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2rem] p-3 md:p-5 text-lg md:text-2xl font-bold flex-1">きろくする</button>
+    <!-- 保存ボタン -->
+    <div class="flex gap-4 md:gap-6 w-full max-w-5xl shrink-0 mt-2">
+      <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2.5rem] py-4 md:py-6 text-xl md:text-3xl font-bold flex-1">とりなおす</button>
+      <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2.5rem] py-4 md:py-6 text-xl md:text-3xl font-bold flex-[2]">きろくする</button>
     </div>
   </div>
 
@@ -263,17 +255,9 @@
   <div id="view-list" class="view hidden flex flex-col h-full w-full">
     <div class="bg-theme-header text-white pt-10 md:pt-14 pb-4 md:pb-6 px-4 md:px-8 flex justify-between items-center shadow-md shrink-0 z-10 relative">
       <button onclick="showView('home', 'back')" class="bg-theme-btn px-4 md:px-6 py-3 md:py-4 rounded-2xl text-xl md:text-2xl font-bold transition-colors">◀ もどる</button>
-      
-      <!-- 先生モード起動：タイトルを3秒長押し -->
       <h2 class="text-2xl md:text-4xl font-bold cursor-pointer" 
-          ontouchstart="startSecretPress(event)" 
-          ontouchend="cancelSecretPress(event)" 
-          ontouchcancel="cancelSecretPress(event)" 
-          onmousedown="startSecretPress(event)" 
-          onmouseup="cancelSecretPress(event)" 
-          onmouseleave="cancelSecretPress(event)" 
-          style="touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">これまでの きろく</h2>
-          
+          ontouchstart="startSecretPress(event)" ontouchend="cancelSecretPress(event)" ontouchcancel="cancelSecretPress(event)" 
+          onmousedown="startSecretPress(event)" onmouseup="cancelSecretPress(event)" onmouseleave="cancelSecretPress(event)">これまでの きろく</h2>
       <div class="flex gap-4">
         <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-3 md:px-4 py-2 md:py-3 rounded-xl text-lg md:text-xl font-bold transition-colors border-2 border-white shadow-sm flex flex-col items-center">
           <span>🖨️ ぜんぶ PDF ほぞん</span>
@@ -326,7 +310,7 @@
     </div>
   </div>
 
-  <!-- 新しい称号お祝いアニメーション用モーダル -->
+  <!-- 称号お祝いアニメーション用モーダル -->
   <div id="modal-levelup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm">
     <div class="bg-white rounded-[3rem] p-8 border-[10px] border-yellow-400 max-w-sm w-full text-center relative overflow-hidden shadow-2xl">
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
@@ -438,7 +422,10 @@
     let currentUserName = '';
     let audioCtx = null;
     let videoStream = null;
-    let currentCalendarDate = new Date();
+    
+    let currentWeekStart = new Date();
+    currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay());
+
     let isPreviewWatered = false;
     let currentNoticeIndex = -1; 
     let noticePage = 0; 
@@ -660,41 +647,37 @@
 
     function renderCalendar() {
       updateTitleDisplay();
-      const year = currentCalendarDate.getFullYear();
-      const month = currentCalendarDate.getMonth();
+      const month = currentWeekStart.getMonth();
       document.getElementById('calendarTitle').innerText = `${month + 1}がつ`;
       
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = `
-        <div class="text-theme-main font-bold text-xs md:text-sm py-1 md:py-2">にち</div>
-        <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">げつ</div>
-        <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">か</div>
-        <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">すい</div>
-        <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">もく</div>
-        <div class="font-bold text-gray-600 text-xs md:text-sm py-1 md:py-2">きん</div>
-        <div class="text-blue-500 font-bold text-xs md:text-sm py-1 md:py-2">ど</div>
+        <div class="text-theme-main font-bold text-xs md:text-sm py-1">にち</div>
+        <div class="font-bold text-gray-600 text-xs md:text-sm py-1">げつ</div>
+        <div class="font-bold text-gray-600 text-xs md:text-sm py-1">か</div>
+        <div class="font-bold text-gray-600 text-xs md:text-sm py-1">すい</div>
+        <div class="font-bold text-gray-600 text-xs md:text-sm py-1">もく</div>
+        <div class="font-bold text-gray-600 text-xs md:text-sm py-1">きん</div>
+        <div class="text-blue-500 font-bold text-xs md:text-sm py-1">ど</div>
       `;
       
-      const firstDay = new Date(year, month, 1).getDay();
-      const lastDate = new Date(year, month + 1, 0).getDate();
       let wateringDays = JSON.parse(localStorage.getItem('watering_days')) || [];
       const todayStr = getTodayKey();
       
-      for (let i = 0; i < firstDay; i++) {
-        grid.appendChild(document.createElement('div'));
-      }
-      
-      for (let d = 1; d <= lastDate; d++) {
-        const cell = document.createElement('div');
-        const dateKey = `${year}-${month + 1}-${d}`; 
+      for (let i = 0; i < 7; i++) {
+        let d = new Date(currentWeekStart);
+        d.setDate(d.getDate() + i);
+        
+        const dateKey = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
         const isWatered = wateringDays.includes(dateKey);
         const isToday = dateKey === todayStr;
         
-        cell.className = `calendar-cell flex flex-col items-center justify-start pt-0.5 md:pt-1 rounded-lg md:rounded-xl border-2 transition-colors ${isToday ? 'border-theme-medium bg-theme-bg shadow-inner' : 'border-gray-100 bg-white'}`;
+        const cell = document.createElement('div');
+        cell.className = `calendar-cell flex flex-col items-center justify-start pt-1 md:pt-2 rounded-xl border-2 transition-colors ${isToday ? 'border-theme-medium bg-theme-bg shadow-inner' : 'border-gray-100 bg-white'}`;
         
         const dayText = document.createElement('div');
-        dayText.className = `text-xs md:text-sm font-bold ${isToday ? 'text-theme-dark' : 'text-gray-600'}`;
-        dayText.innerText = d;
+        dayText.className = `text-sm md:text-lg font-bold ${isToday ? 'text-theme-dark' : 'text-gray-600'}`;
+        dayText.innerText = d.getDate();
         cell.appendChild(dayText);
         
         const iconContainer = document.createElement('div');
@@ -709,9 +692,9 @@
       }
     }
 
-    function changeMonth(offset) {
+    function changeWeek(offset) {
       playSound('month'); 
-      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+      currentWeekStart.setDate(currentWeekStart.getDate() + (offset * 7));
       renderCalendar();
     }
 
@@ -722,8 +705,13 @@
       document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
       document.getElementById('view-' + viewName).classList.remove('hidden');
 
-      if (viewName === 'home') renderCalendar(); 
-      else if (viewName === 'list') renderList();
+      if (viewName === 'home') {
+        currentWeekStart = new Date();
+        currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay());
+        renderCalendar(); 
+      } else if (viewName === 'list') {
+        renderList();
+      }
     }
 
     function getTodayString() {
@@ -815,16 +803,16 @@
       const inputModeText = document.getElementById('inputModeText');
 
       if (mode === 'card') {
-        tabCardBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-2 md:py-3 rounded-2xl text-base md:text-xl transition-colors shadow";
-        tabTextBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-2 md:py-3 rounded-2xl text-base md:text-xl transition-colors shadow";
+        tabCardBtn.className = "btn-3d px-3 md:px-5 py-2 md:py-3 bg-green-500 text-white font-bold rounded-xl md:rounded-2xl text-sm md:text-xl transition-colors shadow z-10";
+        tabTextBtn.className = "btn-3d px-3 md:px-5 py-2 md:py-3 bg-gray-200 text-gray-600 font-bold rounded-xl md:rounded-2xl text-sm md:text-xl transition-colors shadow z-0";
         
         inputModeCard.classList.remove('hidden');
         inputModeCard.classList.add('flex');
         inputModeText.classList.add('hidden');
         inputModeText.classList.remove('flex');
       } else {
-        tabCardBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-2 md:py-3 rounded-2xl text-base md:text-xl transition-colors shadow";
-        tabTextBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-2 md:py-3 rounded-2xl text-base md:text-xl transition-colors shadow";
+        tabCardBtn.className = "btn-3d px-3 md:px-5 py-2 md:py-3 bg-gray-200 text-gray-600 font-bold rounded-xl md:rounded-2xl text-sm md:text-xl transition-colors shadow z-0";
+        tabTextBtn.className = "btn-3d px-3 md:px-5 py-2 md:py-3 bg-green-500 text-white font-bold rounded-xl md:rounded-2xl text-sm md:text-xl transition-colors shadow z-10";
         
         inputModeCard.classList.add('hidden');
         inputModeCard.classList.remove('flex');
@@ -844,8 +832,6 @@
       prevBtn.disabled = noticePage === 0;
       nextBtn.disabled = noticePage >= totalPages - 1;
       
-      document.getElementById('noticePageIndicator').innerText = `${noticePage + 1} / ${totalPages}`;
-      
       const startIndex = noticePage * 2;
       const endIndex = Math.min(startIndex + 2, options.length);
       
@@ -854,7 +840,7 @@
         const isSelected = currentNoticeIndex === i;
         const card = document.createElement('div');
         
-        card.className = `btn-3d cursor-pointer border-4 rounded-3xl p-2 md:p-3 flex flex-col items-center text-center transition-all w-full h-full min-h-0 ${
+        card.className = `btn-3d cursor-pointer border-4 rounded-3xl p-1 md:p-2 flex flex-col items-center justify-center text-center transition-all w-full h-full min-h-0 ${
           isSelected 
             ? 'border-blue-500 bg-blue-50 shadow-none transform translate-y-1' 
             : 'border-gray-200 bg-white hover:border-blue-300'
@@ -866,12 +852,11 @@
           renderNoticeOptions(); 
         };
         
-        // ★ イラストがいっぱいに広がるように修正
         card.innerHTML = `
-          <div class="flex-1 min-h-0 w-full mb-1 flex justify-center items-center transition-transform duration-200 ${isSelected ? 'scale-110' : ''}">
-            <img src="${opt.img}" alt="${opt.shortText}" class="max-h-full max-w-full object-contain drop-shadow">
+          <div class="flex-1 w-full min-h-0 mb-1 flex justify-center items-center transition-transform duration-200 ${isSelected ? 'scale-110' : ''}">
+            <img src="${opt.img}" alt="${opt.shortText}" class="w-full h-full object-contain drop-shadow">
           </div>
-          <div class="text-base md:text-xl font-bold ${isSelected ? 'text-blue-700' : 'text-gray-800'} mt-1 shrink-0 px-1 pb-1 leading-tight">${opt.shortText}</div>
+          <div class="text-base md:text-2xl font-bold ${isSelected ? 'text-blue-700' : 'text-gray-800'} mt-1 shrink-0 px-1 pb-1 leading-tight">${opt.shortText}</div>
         `;
         container.appendChild(card);
       }
@@ -905,16 +890,16 @@
       const btn = document.getElementById('previewWaterBtn');
 
       if (isPreviewWatered) {
-        btn.className = "btn-3d w-full bg-gray-200 border-4 border-gray-300 text-gray-500 rounded-[2rem] p-3 md:p-5 flex items-center justify-center gap-4 transition-all pointer-events-none";
+        btn.className = "btn-3d w-full flex-1 bg-gray-200 border-4 border-gray-300 text-gray-500 rounded-3xl flex flex-col items-center justify-center gap-2 transition-all pointer-events-none min-h-0";
         btn.innerHTML = `
-          <img src="images/water_stamp.png" class="w-10 h-10 md:w-14 md:h-14 object-contain opacity-50" alt="じょうろ">
-          <span class="text-xl md:text-3xl font-bold">✨ みずやり できたよ</span>
+          <img src="images/water_stamp.png" class="w-12 h-12 md:w-20 md:h-20 object-contain opacity-50" alt="じょうろ">
+          <span class="text-lg md:text-3xl font-bold">✨ できたよ</span>
         `;
       } else {
-        btn.className = "btn-3d w-full bg-blue-500 hover:bg-blue-600 border-4 border-blue-600 text-white rounded-[2rem] p-3 md:p-5 flex items-center justify-center gap-4 transition-all active:translate-y-2";
+        btn.className = "btn-3d w-full flex-1 bg-blue-500 border-4 border-blue-600 hover:bg-blue-600 text-white rounded-3xl flex flex-col items-center justify-center gap-2 transition-all active:translate-y-2 min-h-0";
         btn.innerHTML = `
-          <img src="images/water_stamp.png" class="w-10 h-10 md:w-14 md:h-14 object-contain drop-shadow-md" alt="じょうろ">
-          <span class="text-xl md:text-3xl font-bold">💧 みずを あげる！</span>
+          <img src="images/water_stamp.png" class="w-12 h-12 md:w-20 md:h-20 object-contain drop-shadow-md" alt="じょうろ">
+          <span class="text-lg md:text-3xl font-bold">💧 あげたよ！</span>
         `;
       }
     }
