@@ -111,7 +111,6 @@
         </div>
       </div>
 
-      <!-- 文字を「みずやり」に変更 -->
       <div class="bg-white rounded-3xl p-4 border-4 border-theme-light shadow-sm flex flex-col shrink-0">
         <h2 class="text-center font-bold text-xl text-theme-dark mb-2">📅 みずやり</h2>
         <div id="weeklyCalendarGrid" class="grid grid-cols-7 gap-2 w-full"></div>
@@ -237,16 +236,23 @@
         { img: 'images/tomato_2.png', shortText: 'ぎざぎざ はっぱ', text: 'はっぱが ぎざぎざ してきたよ。' },
         { img: 'images/tomato_3.png', shortText: 'きいろい はな', text: 'きいろい はなが きれいに さいたよ。' },
         { img: 'images/tomato_4.png', shortText: 'みどりの み', text: 'ちいさな みどりの みが なったよ。' },
+        { img: 'images/tomato_5.png', shortText: 'オレンジの み', text: '実がだんだん オレンジいろに なってきたよ。' },
         { img: 'images/tomato_6.png', shortText: 'あかい トマト', text: 'あかくて おいしそうな トマトになったよ！' }
       ],
       'nasu': [
         { img: 'images/nasu_1.png', shortText: 'ちいさな なえ', text: 'なすの なえを つちに うえたよ。' },
+        { img: 'images/nasu_2.png', shortText: 'はっぱが おおきい', text: 'なすの はっぱが おおきく なったよ。' },
         { img: 'images/nasu_3.png', shortText: 'むらさきの はな', text: 'きれいな むらさきいろの はなが さいたよ。' },
+        { img: 'images/nasu_4.png', shortText: 'ちいさな なす', text: 'ちいさな むらさきの みが なったよ。' },
+        { img: 'images/nasu_5.png', shortText: 'ながい なす', text: 'なすが だんだん ながく なってきたよ。' },
         { img: 'images/nasu_6.png', shortText: 'ぴかぴかの なす', text: 'ぴかぴか ひかる おおきな なすに なったよ！' }
       ],
       'piman': [
         { img: 'images/piman_1.png', shortText: 'ちいさな なえ', text: 'ぴーまんの なえを つちに うえたよ。' },
+        { img: 'images/piman_2.png', shortText: 'ぴんと した はっぱ', text: 'はっぱが ぴんと げんきに なったよ。' },
         { img: 'images/piman_3.png', shortText: 'しろい はな', text: 'ちいさな しろい はなが さいたよ。' },
+        { img: 'images/piman_4.png', shortText: 'ちいさな ぴーまん', text: 'ちいさな ぴーまんの 赤ちゃんが なったよ。' },
+        { img: 'images/piman_5.md.png', shortText: 'ふくらんだ み', text: '実がぷっくり ふくらんできたよ。' },
         { img: 'images/piman_6.png', shortText: 'つやつや ぴーまん', text: 'つやつやの みどりの ぴーまんが なったよ！' }
       ]
     };
@@ -402,11 +408,13 @@
       for(let i=start; i<Math.min(start+2, opts.length); i++) {
         const o = opts[i];
         const btn = document.createElement('button');
-        btn.className = `btn-3d rounded-2xl p-1 flex flex-col items-center justify-center border-4 h-full ${currentNoticeIndex===i ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'}`;
+        btn.className = `btn-3d rounded-2xl p-1 flex flex-col items-center justify-center border-4 h-full overflow-hidden ${currentNoticeIndex===i ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'}`;
         btn.onclick = () => { currentNoticeIndex = i; playSound('click'); renderNoticeOptions(); };
         btn.innerHTML = `
-          <img src="${o.img}" class="h-24 md:h-32 w-full object-contain mb-1">
-          <span class="text-[10px] md:text-xs font-bold text-gray-600 px-1 leading-tight">${o.shortText}</span>
+          <div class="flex-1 w-full flex items-center justify-center p-1">
+            <img src="${o.img}" class="h-full w-full object-contain">
+          </div>
+          <span class="text-[11px] md:text-sm font-bold text-gray-600 px-1 py-1 leading-tight shrink-0">${o.shortText}</span>
         `;
         grid.appendChild(btn);
       }
