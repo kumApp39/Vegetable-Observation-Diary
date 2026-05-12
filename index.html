@@ -6,9 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="やさいかんさつ">
-  <!-- ★ キャッシュ対策でバージョンを変更 -->
-  <link rel="apple-touch-icon" href="./icon.png?v=7">
-  <link rel="icon" type="image/png" href="./icon.png?v=7">
+  <link rel="apple-touch-icon" href="./icon.png?v=6">
+  <link rel="icon" type="image/png" href="./icon.png?v=6">
   <title>やさい かんさつ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -69,7 +68,6 @@
       color: transparent;
     }
 
-    /* 称号アニメーション用のCSS */
     @keyframes popIn {
       0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
       70% { transform: scale(1.2) rotate(10deg); opacity: 1; }
@@ -199,58 +197,71 @@
   </div>
 
   <!-- 2. しゃしんを かくにんする がめん（プレビュー） -->
-  <div id="view-preview" class="view hidden scrollable flex flex-col items-center justify-start h-full w-full px-4 md:px-8 pt-10 md:pt-16 pb-16 md:pb-24 box-border">
-    <h2 class="text-3xl md:text-4xl font-bold text-blue-700 mb-4 md:mb-6" id="previewDate">〇がつ〇にち</h2>
+  <!-- ★ スクロールをなくし、画面内に収まるようにレイアウトを大改修しました -->
+  <div id="view-preview" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 py-4 md:py-6 box-border overflow-hidden">
+    <h2 class="text-2xl md:text-3xl font-bold text-blue-700 mb-2 shrink-0" id="previewDate">〇がつ〇にち</h2>
     
-    <div class="w-full max-w-4xl h-56 md:h-72 bg-white rounded-3xl shadow-inner flex items-center justify-center overflow-hidden mb-4 border-4 border-gray-200 p-2 shrink-0">
-      <img id="previewImage" src="" alt="とったしゃしん" class="max-w-full max-h-full object-contain rounded-2xl">
+    <!-- 画像プレビュー (サイズを少し抑えて可変に) -->
+    <div class="w-full max-w-4xl h-32 md:h-48 bg-white rounded-2xl shadow-inner flex items-center justify-center overflow-hidden mb-3 border-4 border-gray-200 p-2 shrink-0">
+      <img id="previewImage" src="" alt="とったしゃしん" class="max-w-full max-h-full object-contain rounded-xl">
     </div>
 
     <!-- タブ切り替え -->
-    <div class="w-full max-w-4xl mb-4 shrink-0 flex gap-2 md:gap-4 justify-center">
-      <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d flex-1 bg-green-500 text-white font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow">カードで えらぶ</button>
-      <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow">じぶんで かく</button>
+    <div class="w-full max-w-4xl mb-3 shrink-0 flex gap-2 md:gap-4 justify-center">
+      <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d flex-1 bg-green-500 text-white font-bold py-2 md:py-3 rounded-2xl text-lg md:text-xl transition-colors shadow">カードで えらぶ</button>
+      <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-2 md:py-3 rounded-2xl text-lg md:text-xl transition-colors shadow">じぶんで かく</button>
     </div>
 
-    <!-- カードでえらぶエリア -->
-    <div id="inputModeCard" class="w-full max-w-4xl mb-4 md:mb-6 shrink-0 bg-white p-4 md:p-6 rounded-3xl shadow-sm border-4 border-green-200">
-      <label class="block text-2xl md:text-3xl font-bold text-green-700 mb-4 flex justify-center items-center gap-2">
-        <span>✏️</span> いまの ようすは どっちかな？
-      </label>
-      <div class="flex items-stretch justify-center gap-2 md:gap-6 h-80 md:h-[26rem]">
-        <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-20 text-3xl md:text-4xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">◀</button>
-        <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-3 md:gap-6 flex-1 w-full max-w-3xl">
+    <!-- 入力エリアコンテナ (flex-1 で残りの高さを最大限活用) -->
+    <div class="w-full max-w-4xl flex-1 flex flex-col min-h-0 mb-3 gap-3">
+      
+      <!-- カードでえらぶエリア -->
+      <div id="inputModeCard" class="bg-white p-3 md:p-4 rounded-3xl shadow-sm border-4 border-green-200 flex flex-col h-full min-h-0">
+        <label class="block text-lg md:text-2xl font-bold text-green-700 mb-2 flex justify-center items-center gap-2 shrink-0">
+          <span>✏️</span> いまの ようすは どっちかな？
+        </label>
+        <div class="flex items-stretch justify-center gap-2 md:gap-4 flex-1 min-h-0">
+          <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-12 md:w-16 text-2xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">◀</button>
+          
+          <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-3 md:gap-4 flex-1 w-full max-w-3xl min-h-0">
+            <!-- JavaScriptでカードが生成されます -->
+          </div>
+          
+          <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-12 md:w-16 text-2xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
         </div>
-        <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-20 text-3xl md:text-4xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
+        <div id="noticePageIndicator" class="text-center mt-2 font-bold text-green-600 text-sm md:text-lg shrink-0">1 / 3</div>
       </div>
-      <div id="noticePageIndicator" class="text-center mt-5 font-bold text-green-600 text-lg md:text-xl">1 / 3</div>
-    </div>
 
-    <!-- じぶんでかくエリア -->
-    <div id="inputModeText" class="w-full max-w-4xl mb-4 md:mb-6 shrink-0 bg-white p-4 md:p-6 rounded-3xl shadow-sm border-4 border-blue-200 hidden">
-      <label class="block text-2xl md:text-3xl font-bold text-blue-700 mb-4 flex justify-center items-center gap-2">
-        <span>✏️</span> きづいたこと を かいてみよう
-      </label>
-      <textarea id="noticeText" class="w-full rounded-2xl p-4 md:p-6 text-xl md:text-3xl border-4 border-gray-200 bg-gray-50 shadow-inner h-64 md:h-80 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
-    </div>
-
-    <div class="w-full max-w-4xl mb-6 md:mb-8 shrink-0 bg-blue-50 p-4 md:p-6 rounded-3xl border-4 border-blue-200 flex flex-col items-center shadow-inner">
-      <h3 class="text-xl md:text-2xl font-bold text-blue-700 mb-3 md:mb-4 flex items-center gap-2">
-        <img src="images/water_stamp.png" class="w-8 h-8 md:w-10 md:h-10 object-contain" alt="じょうろ">
-        きょうは みずを あげたかな？
-      </h3>
-      <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="btn-3d bg-blue-500 text-white rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 transition-all">
-        みずを あげたよ！
-      </button>
-      <div id="previewWaterStamp" class="hidden mt-4 animate-bounce">
-        <!-- ★ 共通の「じょうろ」スタンプ画像 -->
-        <img id="previewWaterStampImg" src="images/water_stamp.png" class="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-md" alt="みずやりスタンプ">
+      <!-- じぶんでかくエリア -->
+      <div id="inputModeText" class="hidden bg-white p-3 md:p-4 rounded-3xl shadow-sm border-4 border-blue-200 flex flex-col h-full min-h-0">
+        <label class="block text-lg md:text-2xl font-bold text-blue-700 mb-2 flex justify-center items-center gap-2 shrink-0">
+          <span>✏️</span> きづいたこと を かいてみよう
+        </label>
+        <textarea id="noticeText" class="w-full rounded-2xl p-4 text-lg md:text-2xl border-4 border-gray-200 bg-gray-50 shadow-inner flex-1 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
       </div>
     </div>
-    
-    <div class="flex gap-4 md:gap-6 w-full max-w-4xl pb-8 shrink-0">
-      <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2rem] p-4 md:p-6 text-2xl md:text-3xl font-bold flex-1">とりなおす</button>
-      <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2rem] p-4 md:p-6 text-2xl md:text-3xl font-bold flex-1">きろくする</button>
+
+    <!-- 水やりボタン & アクションボタン (一番下に固定) -->
+    <div class="w-full max-w-4xl shrink-0 flex flex-col gap-3">
+      <div class="bg-blue-50 p-2 md:p-4 rounded-3xl border-4 border-blue-200 flex items-center justify-between shadow-inner px-4">
+        <h3 class="text-base md:text-xl font-bold text-blue-700 flex items-center gap-2 mb-0">
+          <img src="images/water_stamp.png" class="w-8 h-8 md:w-10 md:h-10 object-contain" alt="じょうろ">
+          みずを あげたかな？
+        </h3>
+        <div class="flex items-center gap-2">
+          <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="btn-3d bg-blue-500 text-white rounded-[2rem] py-2 px-4 md:px-6 text-lg md:text-xl font-bold transition-all whitespace-nowrap">
+            みずを あげたよ！
+          </button>
+          <div id="previewWaterStamp" class="hidden animate-bounce shrink-0">
+            <img id="previewWaterStampImg" src="images/water_stamp.png" class="w-10 h-10 md:w-12 md:h-12 object-contain drop-shadow-md" alt="みずやりスタンプ">
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex gap-3 md:gap-6 w-full">
+        <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2rem] p-3 md:p-4 text-xl md:text-2xl font-bold flex-1">とりなおす</button>
+        <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2rem] p-3 md:p-4 text-xl md:text-2xl font-bold flex-1">きろくする</button>
+      </div>
     </div>
   </div>
 
@@ -258,8 +269,6 @@
   <div id="view-list" class="view hidden flex flex-col h-full w-full">
     <div class="bg-theme-header text-white pt-10 md:pt-14 pb-4 md:pb-6 px-4 md:px-8 flex justify-between items-center shadow-md shrink-0 z-10 relative">
       <button onclick="showView('home', 'back')" class="bg-theme-btn px-4 md:px-6 py-3 md:py-4 rounded-2xl text-xl md:text-2xl font-bold transition-colors">◀ もどる</button>
-      
-      <!-- 先生モード起動：タイトルを3秒長押し -->
       <h2 class="text-2xl md:text-4xl font-bold cursor-pointer" 
           ontouchstart="startSecretPress(event)" 
           ontouchend="cancelSecretPress(event)" 
@@ -268,7 +277,6 @@
           onmouseup="cancelSecretPress(event)" 
           onmouseleave="cancelSecretPress(event)" 
           style="touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">これまでの きろく</h2>
-          
       <div class="flex gap-4">
         <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-3 md:px-4 py-2 md:py-3 rounded-xl text-lg md:text-xl font-bold transition-colors border-2 border-white shadow-sm flex flex-col items-center">
           <span>🖨️ ぜんぶ PDF ほぞん</span>
@@ -278,7 +286,6 @@
     </div>
     
     <div id="recordList" class="scrollable snap-container flex-1 p-4 md:p-8 flex flex-col gap-8 pb-16 md:pb-24 bg-gray-100">
-      <!-- JavaScriptでここに記録が追加されます -->
     </div>
   </div>
 
@@ -321,7 +328,7 @@
     </div>
   </div>
 
-  <!-- 新しい称号お祝いアニメーション用モーダル -->
+  <!-- 称号お祝いアニメーション用モーダル -->
   <div id="modal-levelup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm">
     <div class="bg-white rounded-[3rem] p-8 border-[10px] border-yellow-400 max-w-sm w-full text-center relative overflow-hidden shadow-2xl">
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
@@ -401,7 +408,6 @@
       { min: 0,   name: "はじめての みずやり", img: "images/rank_0.png" }
     ];
 
-    // ★ カードの文字量を少なく、端的な特徴（shortText）にする設定
     const NOTICE_OPTIONS = {
       'tomato': [
         { img: 'images/tomato_1.png', title: 'なえうえ', shortText: 'ちいさな なえ', text: 'ちいさな なえを つちに うえたよ。「おおきくなあれ」と おねがい しよう。' },
@@ -610,7 +616,6 @@
       const data = YASAI_DATA[type];
       
       document.getElementById('homeIconImg').src = data.img;
-      
       document.getElementById('homeTitle').innerHTML = `${currentUserName}さんの<br>${data.name}の きろく`;
     }
 
@@ -752,22 +757,16 @@
       document.getElementById('cameraVideo').srcObject = null;
     }
 
-    // ★ エラーで止まるのを絶対に防ぐ、カメラ撮影処理の完全版
     function takePhoto() {
       try {
         playSound('camera'); 
         const video = document.getElementById('cameraVideo');
         
-        // iPadなどで映像サイズが取得できなかった場合の安全対策
         let width = video.videoWidth;
         let height = video.videoHeight;
         
-        if (!width || width === 0) {
-          width = 800;
-        }
-        if (!height || height === 0) {
-          height = 600;
-        }
+        if (!width || width === 0) width = 800;
+        if (!height || height === 0) height = 600;
         
         const MAX_WIDTH = 800;
         if (width > MAX_WIDTH) {
@@ -784,7 +783,6 @@
           ctx.drawImage(video, 0, 0, width, height);
           currentImageData = canvas.toDataURL('image/jpeg', 0.6);
         } catch (e) {
-          // もし画像が取れなくても、透明な画像をセットして次に進む
           currentImageData = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
         }
         
@@ -796,9 +794,7 @@
         noticePage = 0;
         
         const noticeTextEl = document.getElementById('noticeText');
-        if (noticeTextEl) {
-          noticeTextEl.value = '';
-        }
+        if (noticeTextEl) noticeTextEl.value = '';
         
         renderNoticeOptions();
         initPreviewWatering();
@@ -806,7 +802,6 @@
         showView('preview', false);
         
       } catch (err) {
-        // 万が一別のエラーが起きても、無理やりカメラを止めてプレビュー画面へ移動させる
         console.error("Camera Error:", err);
         stopCamera();
         showView('preview', false);
@@ -822,15 +817,21 @@
       const inputModeText = document.getElementById('inputModeText');
 
       if (mode === 'card') {
-        tabCardBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
-        tabTextBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
+        tabCardBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-2 md:py-3 rounded-2xl text-lg md:text-xl transition-colors shadow";
+        tabTextBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-2 md:py-3 rounded-2xl text-lg md:text-xl transition-colors shadow";
+        
         inputModeCard.classList.remove('hidden');
+        inputModeCard.classList.add('flex');
         inputModeText.classList.add('hidden');
+        inputModeText.classList.remove('flex');
       } else {
-        tabCardBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
-        tabTextBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow";
+        tabCardBtn.className = "btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-2 md:py-3 rounded-2xl text-lg md:text-xl transition-colors shadow";
+        tabTextBtn.className = "btn-3d flex-1 bg-green-500 text-white font-bold py-2 md:py-3 rounded-2xl text-lg md:text-xl transition-colors shadow";
+        
         inputModeCard.classList.add('hidden');
+        inputModeCard.classList.remove('flex');
         inputModeText.classList.remove('hidden');
+        inputModeText.classList.add('flex');
       }
     }
 
@@ -854,24 +855,27 @@
         const opt = options[i];
         const isSelected = currentNoticeIndex === i;
         const card = document.createElement('div');
-        card.className = `btn-3d cursor-pointer border-4 rounded-3xl p-3 md:p-6 flex flex-col items-center text-center transition-all ${
+        
+        // ★ 高さをいっぱいに使い、無駄な余白を削減
+        card.className = `btn-3d cursor-pointer border-4 rounded-3xl p-2 md:p-4 flex flex-col items-center text-center transition-all h-full min-h-0 w-full ${
           isSelected 
-            ? 'border-blue-500 bg-blue-50 shadow-none transform translate-y-2' 
+            ? 'border-blue-500 bg-blue-50 shadow-none transform translate-y-1' 
             : 'border-gray-200 bg-white hover:border-blue-300'
         }`;
+        
         card.onclick = () => {
           playSound('click');
           currentNoticeIndex = i;
           renderNoticeOptions(); 
         };
         
-        // ★ イラストを大きく、文字量を少なく変更
+        // ★ イラストエリア（flex-1 min-h-0）で画像を最大限大きく表示
         card.innerHTML = `
-          <div class="w-32 h-32 md:w-48 md:h-48 mb-2 md:mb-4 flex-shrink-0 pt-2 transition-transform duration-200 ${isSelected ? 'scale-110' : ''}">
-            <img src="${opt.img}" alt="${opt.title}" class="w-full h-full object-contain drop-shadow">
+          <div class="flex-1 min-h-0 w-full mb-1 flex justify-center items-center transition-transform duration-200 ${isSelected ? 'scale-110' : ''}">
+            <img src="${opt.img}" alt="${opt.title}" class="max-w-full max-h-full object-contain drop-shadow">
           </div>
-          <div class="text-xl md:text-3xl font-bold ${isSelected ? 'text-blue-700' : 'text-gray-800'} mb-1 md:mb-2">${opt.title}</div>
-          <div class="text-base md:text-xl ${isSelected ? 'text-blue-800 font-bold' : 'text-gray-600'} leading-tight px-1 md:px-2 pb-2">${opt.shortText}</div>
+          <div class="text-lg md:text-2xl font-bold ${isSelected ? 'text-blue-700' : 'text-gray-800'} shrink-0 mb-1">${opt.title}</div>
+          <div class="text-sm md:text-base ${isSelected ? 'text-blue-800 font-bold' : 'text-gray-600'} leading-tight shrink-0 px-1 pb-1">${opt.shortText}</div>
         `;
         container.appendChild(card);
       }
@@ -906,18 +910,15 @@
       const stampContainer = document.getElementById('previewWaterStamp');
       const stampImg = document.getElementById('previewWaterStampImg');
       
-      // ★ プレビュー画面のスタンプを「じょうろ（water_stamp.png）」に変更
-      if (stampImg) {
-        stampImg.src = 'images/water_stamp.png'; 
-      }
+      if (stampImg) stampImg.src = 'images/water_stamp.png'; 
 
       if (isPreviewWatered) {
-        btn.className = "bg-gray-300 text-gray-500 rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 pointer-events-none";
-        btn.innerHTML = "✨ みずやり できたよ";
+        btn.className = "bg-gray-300 text-gray-500 rounded-[2rem] py-2 px-4 md:px-6 text-lg md:text-xl font-bold pointer-events-none whitespace-nowrap";
+        btn.innerHTML = "✨ できたよ";
         stampContainer.classList.remove('hidden');
       } else {
-        btn.className = "btn-3d bg-blue-500 text-white rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 active:bg-blue-600";
-        btn.innerHTML = "💧 みずを あげたよ！";
+        btn.className = "btn-3d bg-blue-500 text-white rounded-[2rem] py-2 px-4 md:px-6 text-lg md:text-xl font-bold active:bg-blue-600 whitespace-nowrap";
+        btn.innerHTML = "💧 あげたよ！";
         stampContainer.classList.add('hidden');
       }
     }
