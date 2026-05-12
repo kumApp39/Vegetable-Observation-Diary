@@ -6,8 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="やさいかんさつ">
-  <link rel="apple-touch-icon" href="./icon.png?v=5">
-  <link rel="icon" type="image/png" href="./icon.png?v=5">
+  <link rel="apple-touch-icon" href="./icon.png?v=6">
+  <link rel="icon" type="image/png" href="./icon.png?v=6">
   <title>やさい かんさつ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -63,7 +63,6 @@
       scroll-snap-align: start;
       scroll-margin-top: 1rem;
     }
-    /* 画像が読み込まれない時のプレースホルダー */
     img {
       color: transparent;
     }
@@ -182,7 +181,7 @@
       <img id="previewImage" src="" alt="とったしゃしん" class="max-w-full max-h-full object-contain rounded-2xl">
     </div>
 
-    <!-- ★タブ切り替え（えらぶ か かくか） -->
+    <!-- タブ切り替え -->
     <div class="w-full max-w-4xl mb-4 shrink-0 flex gap-2 md:gap-4 justify-center">
       <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d flex-1 bg-green-500 text-white font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow">カードで えらぶ</button>
       <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d flex-1 bg-gray-200 text-gray-600 font-bold py-3 md:py-4 rounded-2xl text-xl md:text-2xl transition-colors shadow">じぶんで かく</button>
@@ -196,7 +195,6 @@
       <div class="flex items-stretch justify-center gap-2 md:gap-6 h-80 md:h-[26rem]">
         <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-20 text-3xl md:text-4xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">◀</button>
         <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-3 md:gap-6 flex-1 w-full max-w-3xl">
-          <!-- JavaScriptでカードが生成されます -->
         </div>
         <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 hover:bg-green-200 rounded-2xl w-14 md:w-20 text-3xl md:text-4xl font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed">▶</button>
       </div>
@@ -261,15 +259,18 @@
 
   <!-- モーダル類 -->
   <div id="modal-success" class="hidden absolute inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-4"></div>
+  
   <div id="modal-error" class="hidden absolute inset-0 bg-white z-50 flex flex-col items-center justify-center p-8 text-center">
     <div id="errorIcon" class="text-7xl md:text-8xl mb-6">⚠️</div>
     <div id="errorTitle" class="text-3xl md:text-4xl text-red-500 font-bold mb-6 md:mb-8">おかしいな？</div>
     <div class="text-2xl md:text-3xl text-gray-700 mb-10 md:mb-12 leading-relaxed" id="errorMsg">せんせいを よんでね</div>
     <div id="errorButtons" class="flex gap-4 w-full max-w-md">
+      <!-- ★「もどる」ボタンに変更 -->
       <button onclick="document.getElementById('modal-error').classList.add('hidden')" class="btn-3d bg-blue-400 text-white text-2xl md:text-3xl px-6 py-5 md:py-6 rounded-3xl font-bold flex-1">もどる</button>
       <button onclick="showConfirm()" id="clearBtn" class="hidden btn-3d bg-red-400 text-white text-2xl md:text-3xl px-6 py-5 md:py-6 rounded-3xl font-bold flex-1">きろくを けす</button>
     </div>
   </div>
+
   <div id="modal-confirm" class="hidden absolute inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-[2rem] p-6 md:p-8 flex flex-col items-center max-w-lg w-full text-center">
       <div class="text-5xl md:text-6xl mb-4">🗑️</div>
@@ -281,7 +282,7 @@
     </div>
   </div>
 
-  <!-- ★ 先生用リセットメニュー -->
+  <!-- 先生用リセットメニュー -->
   <div id="modal-reset" class="hidden absolute inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-[2rem] p-6 md:p-8 flex flex-col items-center max-w-lg w-full text-center border-8 border-orange-300">
       <div class="text-xl font-bold text-gray-500 mb-2">せんせいメニュー</div>
@@ -513,15 +514,6 @@
       }
     }
 
-    async function requestCameraPermission() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
-        stream.getTracks().forEach(track => track.stop());
-      } catch (err) {
-        console.warn("カメラ許可スキップ/拒否:", err);
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
       try {
         const savedName = localStorage.getItem('user_name');
@@ -534,10 +526,7 @@
         } else {
           showView('select', false);
         }
-        if (!sessionStorage.getItem('camera_requested')) {
-          sessionStorage.setItem('camera_requested', 'true');
-          setTimeout(requestCameraPermission, 500);
-        }
+        // ★アプリ起動時のカメラ事前リクエストを削除しました。
       } catch (e) {
         document.getElementById('view-select').classList.remove('hidden');
       }
@@ -842,16 +831,20 @@
 
     function updatePreviewWateringUI() {
       const btn = document.getElementById('previewWaterBtn');
-      const stamp = document.getElementById('previewWaterStamp');
+      const stampContainer = document.getElementById('previewWaterStamp');
+      const stampImg = document.getElementById('previewWaterStampImg');
       
+      // ★ ここでも「じょうろ」の画像を共通で使用します
+      stampImg.src = 'images/water_stamp.png'; 
+
       if (isPreviewWatered) {
         btn.className = "bg-gray-300 text-gray-500 rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 pointer-events-none";
         btn.innerHTML = "✨ みずやり できたよ";
-        stamp.classList.remove('hidden');
+        stampContainer.classList.remove('hidden');
       } else {
         btn.className = "btn-3d bg-blue-500 text-white rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 active:bg-blue-600";
         btn.innerHTML = "💧 みずを あげたよ！";
-        stamp.classList.add('hidden');
+        stampContainer.classList.add('hidden');
       }
     }
 
@@ -1068,7 +1061,20 @@
       clearTimeout(secretPressTimer);
     }
 
-    // ★ はじめの画面に戻るための隠しコマンド
+    function updateTeacherModeUI() {
+      const batchBtn = document.getElementById('batchPdfBtn');
+      const individualBtns = document.querySelectorAll('.teacher-pdf-btn');
+      
+      if (isTeacherMode) {
+        batchBtn.classList.remove('hidden');
+        individualBtns.forEach(btn => btn.classList.remove('hidden'));
+      } else {
+        batchBtn.classList.add('hidden');
+        individualBtns.forEach(btn => btn.classList.add('hidden'));
+      }
+    }
+
+    // ★ 先生用リセットメニューの関数
     function startResetPress(e) {
       cancelResetPress(); 
       resetPressTimer = setTimeout(() => {
@@ -1092,7 +1098,6 @@
 
     function goToSelectView() {
       playSound('click');
-      // 名前と野菜の設定だけを消してリロード（記録は残ります）
       localStorage.removeItem('user_name');
       localStorage.removeItem('yasai_type');
       location.reload();
@@ -1101,20 +1106,7 @@
     function showConfirmFromMenu() {
       playSound('click');
       document.getElementById('modal-reset').classList.add('hidden');
-      showConfirm(); // 既存の「すべて消す」確認画面を呼び出す
-    }
-
-    function updateTeacherModeUI() {
-      const batchBtn = document.getElementById('batchPdfBtn');
-      const individualBtns = document.querySelectorAll('.teacher-pdf-btn');
-      
-      if (isTeacherMode) {
-        batchBtn.classList.remove('hidden');
-        individualBtns.forEach(btn => btn.classList.remove('hidden'));
-      } else {
-        batchBtn.classList.add('hidden');
-        individualBtns.forEach(btn => btn.classList.add('hidden'));
-      }
+      showConfirm(); 
     }
 
     function showError(msg, canClear = false) {
