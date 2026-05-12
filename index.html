@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Apple Web App Settings -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="やさいかんさつ">
+  <link rel="apple-touch-icon" href="images/tomato_main.png">
+  
   <title>やさい かんさつ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -58,6 +62,11 @@
     .animate-pop-in {
       animation: popIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
+    
+    /* PDF出力用スタイル */
+    @media print {
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body class="h-screen w-screen flex flex-col items-center relative text-gray-800">
@@ -97,9 +106,9 @@
     <div class="w-full max-w-5xl flex flex-col flex-1 gap-4 min-h-0">
       <div class="bg-yellow-50 rounded-3xl p-4 border-4 border-yellow-300 shadow-sm flex flex-col md:flex-row items-center gap-4 shrink-0">
         <div class="flex items-center gap-3">
-          <div class="w-16 h-16 bg-white rounded-full border-2 border-yellow-300 p-1 flex items-center justify-center">
+          <button onclick="showLargeRank()" class="w-16 h-16 bg-white rounded-full border-2 border-yellow-300 p-1 flex items-center justify-center active:scale-95 transition-transform">
             <img id="currentRankImg" src="" class="w-full h-full object-contain">
-          </div>
+          </button>
           <div>
             <div class="text-xs text-gray-500 font-bold">👑 いまの しょうごう</div>
             <div id="userTitle" class="text-xl font-bold text-orange-500"></div>
@@ -185,10 +194,17 @@
 
   <!-- 3. リスト画面 -->
   <div id="view-list" class="view hidden flex flex-col h-full w-full">
-    <div class="bg-theme-header text-white pt-10 pb-4 px-6 flex justify-between items-center shadow-md shrink-0">
+    <div class="bg-theme-header text-white pt-10 pb-4 px-6 flex justify-between items-center shadow-md shrink-0 no-print">
       <button onclick="showView('home', 'back')" class="bg-theme-btn px-6 py-3 rounded-2xl text-xl font-bold">◀ もどる</button>
-      <h2 class="text-2xl font-bold">これまでの きろく</h2>
-      <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-4 py-2 rounded-xl text-sm font-bold border-2 border-white">PDF ほぞん</button>
+      <h2 class="text-2xl font-bold" ontouchstart="startPdfPress(event)" ontouchend="cancelPdfPress(event)">これまでの きろく</h2>
+      <div class="w-24 flex justify-end">
+        <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-4 py-2 rounded-xl text-sm font-bold border-2 border-white">せんせいボタン</button>
+      </div>
+    </div>
+    <!-- PDF印刷用ヘッダー -->
+    <div id="pdf-header" class="hidden p-8 border-b-4 border-gray-800">
+      <h1 id="pdf-title" class="text-4xl font-bold mb-2"></h1>
+      <p class="text-xl text-gray-600">かんさつにっき まとめ</p>
     </div>
     <div id="recordList" class="scrollable flex-1 p-4 flex flex-col gap-8 pb-20 bg-gray-100"></div>
   </div>
@@ -203,6 +219,18 @@
       </div>
       <h3 id="modalRankName" class="text-2xl font-bold text-blue-700 mb-6 leading-tight"></h3>
       <button onclick="closeLevelUpModal()" class="w-full btn-3d bg-red-500 text-white text-xl font-bold py-4 rounded-full">ありがとう！</button>
+    </div>
+  </div>
+
+  <!-- 称号拡大用モーダル -->
+  <div id="modal-rank-large" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onclick="this.classList.add('hidden')">
+    <div class="bg-white rounded-[4rem] p-10 border-[12px] border-yellow-400 max-w-md w-full text-center shadow-2xl animate-pop-in" onclick="event.stopPropagation()">
+      <div id="largeRankTitle" class="text-2xl font-bold text-orange-600 mb-6">いまの しょうごう</div>
+      <div class="w-64 h-64 mx-auto mb-6 bg-yellow-50 rounded-full border-8 border-white flex items-center justify-center shadow-inner">
+        <img id="largeRankImg" src="" class="w-48 h-48 object-contain">
+      </div>
+      <h3 id="largeRankName" class="text-3xl font-bold text-blue-700 mb-8 leading-tight"></h3>
+      <button onclick="document.getElementById('modal-rank-large').classList.add('hidden')" class="w-full btn-3d bg-yellow-500 text-white text-2xl font-bold py-5 rounded-full">とじる</button>
     </div>
   </div>
 
@@ -241,7 +269,7 @@
       ],
       'nasu': [
         { img: 'images/nasu_1.png', shortText: 'ちいさな なえ', text: 'なすの なえを つちに うえたよ。' },
-        { img: 'images/nasu_2.png', shortText: 'はっぱが おおきい', text: 'なすの はっぱが おおきく なったよ。' },
+        { img: 'images/nasu_2.png', shortText: 'はっぱが おおきい', text: 'なすの はっぱが おおきく なったよ. ' },
         { img: 'images/nasu_3.png', shortText: 'むらさきの はな', text: 'きれいな むらさきいろの はなが さいたよ。' },
         { img: 'images/nasu_4.png', shortText: 'ちいさな なす', text: 'ちいさな むらさきの みが なったよ。' },
         { img: 'images/nasu_5.png', shortText: 'ながい なす', text: 'なすが だんだん ながく なってきたよ。' },
@@ -251,7 +279,7 @@
         { img: 'images/piman_1.png', shortText: 'ちいさな なえ', text: 'ぴーまんの なえを つちに うえたよ。' },
         { img: 'images/piman_2.png', shortText: 'ぴんと した はっぱ', text: 'はっぱが ぴんと げんきに なったよ。' },
         { img: 'images/piman_3.png', shortText: 'しろい はな', text: 'ちいさな しろい はなが さいたよ。' },
-        { img: 'images/piman_4.png', shortText: 'ちいさな ぴーまん', text: 'ちいさな ぴーまんの 赤ちゃんが なったよ。' },
+        { img: 'images/piman_4.png', shortText: 'ちいさな ぴーまん', text: 'ちいさな ぴーまんの 赤ちゃんが なったよ. ' },
         { img: 'images/piman_5.md.png', shortText: 'ふくらんだ み', text: '実がぷっくり ふくらんできたよ。' },
         { img: 'images/piman_6.png', shortText: 'つやつや ぴーまん', text: 'つやつやの みどりの ぴーまんが なったよ！' }
       ]
@@ -266,6 +294,7 @@
     let currentInputMode = 'card';
     let videoStream = null;
     let resetTimer = null;
+    let pdfBtnTimer = null;
     let audioCtx = null;
 
     function playSound(type) {
@@ -316,7 +345,7 @@
     }
 
     function showView(name, sound) {
-      if(sound) playSound(sound);
+      if(sound) playSound('click');
       document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
       document.getElementById('view-'+name).classList.remove('hidden');
       if(name === 'home') { renderWeeklyCalendar(); updateStatus(); }
@@ -342,7 +371,7 @@
         cell.innerHTML = `
           <div class="text-[10px] font-bold text-gray-500">${weekNames[i]}</div>
           <div class="text-sm font-bold ${isToday ? 'text-theme-main' : ''}">${d.getDate()}</div>
-          <div class="h-8 flex items-center justify-center">${hasWatered ? '<img src="images/water_stamp.png" class="w-6 h-6 object-contain">' : ''}</div>
+          <div class="h-8 md:h-10 flex items-center justify-center">${hasWatered ? '<img src="images/water_stamp.png" class="w-10 h-10 md:w-12 md:h-12 object-contain">' : ''}</div>
         `;
         grid.appendChild(cell);
       }
@@ -354,9 +383,23 @@
       document.getElementById('totalStampCount').innerText = count;
       let rank = WATERING_TITLES[WATERING_TITLES.length - 1];
       for(let r of WATERING_TITLES) { if(count >= r.min) { rank = r; break; } }
-      document.getElementById('userTitle').innerText = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
+      const rankName = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
+      document.getElementById('userTitle').innerText = rankName;
       document.getElementById('currentRankImg').src = rank.img;
       document.getElementById('titleProgressBar').style.width = Math.min(100, (count/30)*100) + '%';
+    }
+
+    function showLargeRank() {
+      const wateringDays = JSON.parse(localStorage.getItem('watering_days') || '[]');
+      const count = wateringDays.length;
+      let rank = WATERING_TITLES[WATERING_TITLES.length - 1];
+      for(let r of WATERING_TITLES) { if(count >= r.min) { rank = r; break; } }
+      const rankName = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
+      
+      document.getElementById('largeRankImg').src = rank.img;
+      document.getElementById('largeRankName').innerText = rankName;
+      document.getElementById('modal-rank-large').classList.remove('hidden');
+      playSound('click');
     }
 
     async function startCamera() {
@@ -445,9 +488,16 @@
       if(currentInputMode === 'card') {
         if(currentNoticeIndex === -1) return;
         const o = NOTICE_OPTIONS[currentYasai][currentNoticeIndex];
-        noticeHtml = `<div class="flex items-center gap-4"><img src="${o.img}" class="w-16"><div>${o.text}</div></div>`;
+        noticeHtml = `
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 bg-white rounded-2xl border-2 border-green-100 p-2 flex items-center justify-center shrink-0 shadow-sm">
+              <img src="${o.img}" class="max-w-full max-h-full object-contain">
+            </div>
+            <div class="text-xl md:text-2xl font-bold text-green-800 leading-tight">${o.text}</div>
+          </div>
+        `;
       } else {
-        noticeHtml = `<div>${document.getElementById('noticeText').value}</div>`;
+        noticeHtml = `<div class="text-xl md:text-2xl font-bold text-blue-800 leading-relaxed">${document.getElementById('noticeText').value}</div>`;
       }
       records.push({ id: Date.now(), image: currentImageData, notice: noticeHtml, dateStr: `${date.getMonth()+1}がつ ${date.getDate()}にち`, yasai: currentYasai });
       localStorage.setItem('yasai_records', JSON.stringify(records));
@@ -486,11 +536,15 @@
       const records = JSON.parse(localStorage.getItem('yasai_records') || '[]');
       records.reverse().forEach(r => {
         const div = document.createElement('div');
-        div.className = "bg-white rounded-3xl p-4 border-4 border-theme-light shadow-md flex flex-col gap-4";
+        div.className = "bg-white rounded-[2.5rem] p-5 md:p-8 border-4 border-theme-light shadow-md flex flex-col gap-5";
         div.innerHTML = `
-          <div class="text-xl font-bold text-theme-dark">${r.dateStr}</div>
-          <img src="${r.image}" class="w-full rounded-2xl">
-          <div class="bg-blue-50 p-4 rounded-xl border-2 border-blue-100">${r.notice}</div>
+          <div class="text-2xl md:text-3xl font-bold text-theme-dark border-b-4 border-theme-bg pb-2">${r.dateStr}</div>
+          <div class="w-full bg-gray-50 rounded-3xl overflow-hidden border-2 border-gray-100 shadow-inner">
+            <img src="${r.image}" class="w-full h-auto object-contain">
+          </div>
+          <div class="bg-white p-4 md:p-6 rounded-3xl border-4 border-theme-bg shadow-sm">
+            ${r.notice}
+          </div>
         `;
         container.appendChild(div);
       });
@@ -498,9 +552,33 @@
 
     function startResetPress() { resetTimer = setTimeout(() => { document.getElementById('modal-reset').classList.remove('hidden'); playSound('click'); }, 3000); }
     function cancelResetPress() { clearTimeout(resetTimer); }
+    
+    function startPdfPress() { pdfBtnTimer = setTimeout(() => { document.getElementById('batchPdfBtn').classList.remove('hidden'); playSound('click'); }, 3000); }
+    function cancelPdfPress() { clearTimeout(pdfBtnTimer); }
+
     function executeClear() { localStorage.clear(); location.reload(); }
     function goToSelectView() { localStorage.removeItem('user_name'); location.reload(); }
-    function downloadPDF() { }
+
+    function downloadPDF() {
+      const element = document.getElementById('view-list');
+      const header = document.getElementById('pdf-header');
+      const pdfTitle = document.getElementById('pdf-title');
+      
+      pdfTitle.innerText = `${currentUserName}さんの ${YASAI_DATA[currentYasai].name}の きろく`;
+      header.classList.remove('hidden');
+      
+      const opt = {
+        margin: 10,
+        filename: `${currentUserName}_${YASAI_DATA[currentYasai].name}_きろく.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        header.classList.add('hidden');
+      });
+    }
   </script>
 </body>
 </html>
