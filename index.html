@@ -86,9 +86,8 @@
     </div>
   </div>
 
-  <!-- 1. ホーム画面（1週間カレンダー） -->
+  <!-- 1. ホーム画面 -->
   <div id="view-home" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 pt-10 pb-8 box-border overflow-hidden">
-    <!-- ヘッダー -->
     <div class="flex items-center gap-4 mb-4 shrink-0" oncontextmenu="return false;"
          ontouchstart="startResetPress(event)" ontouchend="cancelResetPress(event)">
       <img id="homeIconImg" src="" alt="アイコン" class="w-14 h-14 md:w-20 md:h-20 object-contain drop-shadow-md">
@@ -96,7 +95,6 @@
     </div>
 
     <div class="w-full max-w-5xl flex flex-col flex-1 gap-4 min-h-0">
-      <!-- ステータスエリア -->
       <div class="bg-yellow-50 rounded-3xl p-4 border-4 border-yellow-300 shadow-sm flex flex-col md:flex-row items-center gap-4 shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-16 h-16 bg-white rounded-full border-2 border-yellow-300 p-1 flex items-center justify-center">
@@ -113,15 +111,12 @@
         </div>
       </div>
 
-      <!-- 1週間カレンダー -->
+      <!-- 文字を「みずやり」に変更 -->
       <div class="bg-white rounded-3xl p-4 border-4 border-theme-light shadow-sm flex flex-col shrink-0">
-        <h2 class="text-center font-bold text-lg text-theme-dark mb-2">📅 こんしゅうの びゅう</h2>
-        <div id="weeklyCalendarGrid" class="grid grid-cols-7 gap-2 w-full">
-          <!-- JSで生成 -->
-        </div>
+        <h2 class="text-center font-bold text-xl text-theme-dark mb-2">📅 みずやり</h2>
+        <div id="weeklyCalendarGrid" class="grid grid-cols-7 gap-2 w-full"></div>
       </div>
 
-      <!-- メインボタン -->
       <div class="flex-1 flex flex-col md:flex-row gap-4 py-2">
         <button onclick="startCamera()" class="btn-3d bg-orange-400 text-white rounded-[2.5rem] flex-1 flex flex-col items-center justify-center gap-3">
           <span class="text-6xl">📷</span>
@@ -147,53 +142,45 @@
   </div>
 
   <!-- 2. プレビュー画面 -->
-  <div id="view-preview" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 py-4 box-border relative overflow-hidden">
-    <!-- 日付表示 -->
-    <div class="w-full max-w-5xl text-left mb-2 px-2">
-      <h2 id="previewDate" class="text-2xl md:text-3xl font-bold text-blue-700"></h2>
+  <div id="view-preview" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 pt-12 pb-8 box-border relative overflow-hidden">
+    <div class="w-full max-w-5xl text-left mb-4 px-2">
+      <h2 id="previewDate" class="text-2xl md:text-4xl font-bold text-blue-700"></h2>
     </div>
 
-    <!-- 切り替えボタン（右上隅に固定） -->
-    <div class="absolute top-4 right-4 flex gap-2 z-20">
+    <div class="absolute top-8 right-6 flex gap-2 z-20">
       <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d px-4 py-2 bg-green-500 text-white font-bold rounded-xl text-sm md:text-lg">カードで</button>
       <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d px-4 py-2 bg-gray-200 text-gray-600 font-bold rounded-xl text-sm md:text-lg">じぶんで</button>
     </div>
 
-    <!-- 写真プレビュー -->
-    <div class="w-full max-w-5xl h-32 md:h-48 shrink-0 bg-gray-100 rounded-3xl shadow-inner flex items-center justify-center overflow-hidden border-4 border-gray-300 mb-3">
+    <div class="w-full max-w-5xl h-40 md:h-64 shrink-0 bg-gray-100 rounded-3xl shadow-inner flex items-center justify-center overflow-hidden border-4 border-gray-300 mb-6">
       <img id="previewImage" src="" alt="プレビュー" class="max-w-full max-h-full object-contain">
     </div>
 
-    <!-- 入力・操作エリア -->
-    <div class="w-full max-w-5xl flex-1 flex flex-col md:flex-row gap-4 min-h-0 mb-4">
+    <div class="w-full max-w-5xl flex-1 flex flex-col md:flex-row gap-6 min-h-0 mb-8">
       <div class="flex-[2] flex flex-col relative h-full min-h-0">
-        <!-- カード入力 -->
-        <div id="inputModeCard" class="absolute inset-0 bg-white p-3 rounded-3xl shadow-sm border-4 border-green-200 flex flex-col">
-          <label class="block text-lg font-bold text-green-700 mb-2 text-center shrink-0">✏️ いまの ようすは？</label>
+        <div id="inputModeCard" class="absolute inset-0 bg-white p-4 rounded-3xl shadow-sm border-4 border-green-200 flex flex-col">
+          <label class="block text-xl font-bold text-green-700 mb-2 text-center shrink-0">✏️ いまの ようすは？</label>
           <div class="flex items-center justify-center gap-2 flex-1 min-h-0">
-            <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 rounded-2xl w-12 h-full text-xl font-bold">◀</button>
-            <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-2 flex-1 h-full min-h-0"></div>
-            <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 rounded-2xl w-12 h-full text-xl font-bold">▶</button>
+            <button id="prevNoticeBtn" onclick="changeNoticePage(-1)" class="btn-3d bg-green-100 text-green-700 rounded-2xl w-14 h-full text-2xl font-bold">◀</button>
+            <div id="noticeOptionsGrid" class="grid grid-cols-2 gap-4 flex-1 h-full min-h-0"></div>
+            <button id="nextNoticeBtn" onclick="changeNoticePage(1)" class="btn-3d bg-green-100 text-green-700 rounded-2xl w-14 h-full text-2xl font-bold">▶</button>
           </div>
         </div>
-        <!-- テキスト入力 -->
-        <div id="inputModeText" class="hidden absolute inset-0 bg-white p-4 rounded-3xl shadow-sm border-4 border-blue-200 flex flex-col">
-          <label class="block text-lg font-bold text-blue-700 mb-2 text-center shrink-0">✏️ きづいたことを かこう</label>
-          <textarea id="noticeText" class="w-full rounded-2xl p-4 text-xl border-4 border-gray-200 bg-gray-50 flex-1 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
+        <div id="inputModeText" class="hidden absolute inset-0 bg-white p-6 rounded-3xl shadow-sm border-4 border-blue-200 flex flex-col">
+          <label class="block text-xl font-bold text-blue-700 mb-4 text-center shrink-0">✏️ きづいたことを かこう</label>
+          <textarea id="noticeText" class="w-full rounded-2xl p-4 text-2xl border-4 border-gray-200 bg-gray-50 flex-1 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
         </div>
       </div>
 
-      <!-- 水やりボタン -->
-      <div class="flex-1 bg-blue-50 p-4 rounded-3xl border-4 border-blue-200 flex flex-col items-center justify-center shadow-inner h-full min-h-0">
-        <h3 class="text-lg font-bold text-blue-800 mb-4 text-center">💧 みずをあげた？</h3>
+      <div class="flex-1 bg-blue-50 p-6 rounded-3xl border-4 border-blue-200 flex flex-col items-center justify-center shadow-inner h-full min-h-0">
+        <h3 class="text-xl font-bold text-blue-800 mb-4 text-center">💧 みずをあげた？</h3>
         <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="w-full flex-1 flex flex-col items-center justify-center"></button>
       </div>
     </div>
     
-    <!-- アクションボタン -->
-    <div class="flex gap-4 w-full max-w-5xl shrink-0">
-      <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2rem] py-4 text-xl font-bold flex-1">とりなおす</button>
-      <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2rem] py-4 text-xl font-bold flex-[2]">きろくする</button>
+    <div class="flex gap-6 w-full max-w-5xl shrink-0 mt-auto">
+      <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2rem] py-5 text-2xl font-bold flex-1">とりなおす</button>
+      <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2rem] py-5 text-2xl font-bold flex-[2]">きろくする</button>
     </div>
   </div>
 
@@ -207,7 +194,7 @@
     <div id="recordList" class="scrollable flex-1 p-4 flex flex-col gap-8 pb-20 bg-gray-100"></div>
   </div>
 
-  <!-- 各種モーダル -->
+  <!-- モーダル関係 -->
   <div id="modal-success" class="hidden absolute inset-0 bg-black/40 z-50 flex items-center justify-center p-4"></div>
   <div id="modal-levelup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
     <div class="bg-white rounded-[3rem] p-8 border-[10px] border-yellow-400 max-w-sm w-full text-center shadow-2xl animate-pop-in">
@@ -220,7 +207,6 @@
     </div>
   </div>
 
-  <!-- 先生用メニュー -->
   <div id="modal-reset" class="hidden absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-[2rem] p-8 flex flex-col gap-4 max-w-lg w-full text-center">
       <h2 class="text-2xl font-bold">先生メニュー</h2>
@@ -231,7 +217,6 @@
   </div>
 
   <script>
-    // データ定義
     const YASAI_DATA = {
       'tomato': { name: 'トマト', img: 'images/tomato_main.png', pdfColor: '#ef4444' },
       'nasu': { name: 'ナス', img: 'images/nasu_main.png', pdfColor: '#a855f7' },
@@ -248,25 +233,24 @@
 
     const NOTICE_OPTIONS = {
       'tomato': [
-        { img: 'images/tomato_1.png', shortText: 'なえうえ', text: 'なえを うえたよ。' },
-        { img: 'images/tomato_2.png', shortText: 'はっぱ', text: 'はっぱが ぎざぎざ。' },
-        { img: 'images/tomato_3.png', shortText: 'はな', text: 'きいろい はな。' },
-        { img: 'images/tomato_4.png', shortText: 'みどり', text: 'ちいさな み。' },
-        { img: 'images/tomato_6.png', shortText: 'あか', text: 'あかい トマト！' }
+        { img: 'images/tomato_1.png', shortText: 'ちいさな なえ', text: 'ちいさな なえを つちに うえたよ。' },
+        { img: 'images/tomato_2.png', shortText: 'ぎざぎざ はっぱ', text: 'はっぱが ぎざぎざ してきたよ。' },
+        { img: 'images/tomato_3.png', shortText: 'きいろい はな', text: 'きいろい はなが きれいに さいたよ。' },
+        { img: 'images/tomato_4.png', shortText: 'みどりの み', text: 'ちいさな みどりの みが なったよ。' },
+        { img: 'images/tomato_6.png', shortText: 'あかい トマト', text: 'あかくて おいしそうな トマトになったよ！' }
       ],
       'nasu': [
-        { img: 'images/nasu_1.png', shortText: 'なえうえ', text: 'なえを うえたよ。' },
-        { img: 'images/nasu_3.png', shortText: 'はな', text: 'むらさきの はな。' },
-        { img: 'images/nasu_6.png', shortText: 'しゅうかく', text: 'ぴかぴかの ナス！' }
+        { img: 'images/nasu_1.png', shortText: 'ちいさな なえ', text: 'なすの なえを つちに うえたよ。' },
+        { img: 'images/nasu_3.png', shortText: 'むらさきの はな', text: 'きれいな むらさきいろの はなが さいたよ。' },
+        { img: 'images/nasu_6.png', shortText: 'ぴかぴかの なす', text: 'ぴかぴか ひかる おおきな なすに なったよ！' }
       ],
       'piman': [
-        { img: 'images/piman_1.png', shortText: 'なえうえ', text: 'なえを うえたよ。' },
-        { img: 'images/piman_3.png', shortText: 'はな', text: 'しろい はな。' },
-        { img: 'images/piman_6.png', shortText: 'しゅうかく', text: 'みどりの ピーマン！' }
+        { img: 'images/piman_1.png', shortText: 'ちいさな なえ', text: 'ぴーまんの なえを つちに うえたよ。' },
+        { img: 'images/piman_3.png', shortText: 'しろい はな', text: 'ちいさな しろい はなが さいたよ。' },
+        { img: 'images/piman_6.png', shortText: 'つやつや ぴーまん', text: 'つやつやの みどりの ぴーまんが なったよ！' }
       ]
     };
 
-    // 状態管理
     let currentYasai = 'tomato';
     let currentUserName = '';
     let currentImageData = null;
@@ -278,7 +262,6 @@
     let resetTimer = null;
     let audioCtx = null;
 
-    // 音声
     function playSound(type) {
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -291,7 +274,6 @@
       else if(type === 'water') { osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(1000, now+0.1); g.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now+0.1); }
     }
 
-    // 初期化
     window.onload = () => {
       const name = localStorage.getItem('user_name');
       if(name) {
@@ -335,32 +317,26 @@
       if(name === 'list') renderList();
     }
 
-    // 1週間カレンダー表示
     function renderWeeklyCalendar() {
       const grid = document.getElementById('weeklyCalendarGrid');
       grid.innerHTML = '';
       const today = new Date();
       const firstDay = new Date(today);
       firstDay.setDate(today.getDate() - today.getDay());
-
       const wateringDays = JSON.parse(localStorage.getItem('watering_days') || '[]');
       const weekNames = ['にち','げつ','か','すい','もく','きん','ど'];
-
       for(let i=0; i<7; i++) {
         const d = new Date(firstDay);
         d.setDate(firstDay.getDate() + i);
         const dateStr = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
         const isToday = d.toDateString() === today.toDateString();
         const hasWatered = wateringDays.includes(dateStr);
-
         const cell = document.createElement('div');
         cell.className = `flex flex-col items-center p-2 rounded-2xl border-2 ${isToday ? 'border-theme-main bg-white shadow-md' : 'border-gray-100 bg-gray-50'}`;
         cell.innerHTML = `
           <div class="text-[10px] font-bold text-gray-500">${weekNames[i]}</div>
           <div class="text-sm font-bold ${isToday ? 'text-theme-main' : ''}">${d.getDate()}</div>
-          <div class="h-8 flex items-center justify-center">
-            ${hasWatered ? '<img src="images/water_stamp.png" class="w-6 h-6 object-contain">' : ''}
-          </div>
+          <div class="h-8 flex items-center justify-center">${hasWatered ? '<img src="images/water_stamp.png" class="w-6 h-6 object-contain">' : ''}</div>
         `;
         grid.appendChild(cell);
       }
@@ -377,7 +353,6 @@
       document.getElementById('titleProgressBar').style.width = Math.min(100, (count/30)*100) + '%';
     }
 
-    // カメラ
     async function startCamera() {
       showView('camera', 'photo');
       const video = document.getElementById('cameraVideo');
@@ -385,9 +360,7 @@
       video.srcObject = videoStream;
     }
 
-    function stopCamera() {
-      if(videoStream) videoStream.getTracks().forEach(t => t.stop());
-    }
+    function stopCamera() { if(videoStream) videoStream.getTracks().forEach(t => t.stop()); }
 
     function takePhoto() {
       playSound('photo');
@@ -417,8 +390,8 @@
       currentInputMode = mode;
       document.getElementById('inputModeCard').classList.toggle('hidden', mode !== 'card');
       document.getElementById('inputModeText').classList.toggle('hidden', mode !== 'text');
-      document.getElementById('tabCardBtn').className = mode === 'card' ? 'btn-3d px-4 py-2 bg-green-500 text-white font-bold rounded-xl' : 'btn-3d px-4 py-2 bg-gray-200 text-gray-600 font-bold rounded-xl';
-      document.getElementById('tabTextBtn').className = mode === 'text' ? 'btn-3d px-4 py-2 bg-blue-500 text-white font-bold rounded-xl' : 'btn-3d px-4 py-2 bg-gray-200 text-gray-600 font-bold rounded-xl';
+      document.getElementById('tabCardBtn').className = mode === 'card' ? 'btn-3d px-4 py-2 bg-green-500 text-white font-bold rounded-xl text-sm md:text-lg' : 'btn-3d px-4 py-2 bg-gray-200 text-gray-600 font-bold rounded-xl text-sm md:text-lg';
+      document.getElementById('tabTextBtn').className = mode === 'text' ? 'btn-3d px-4 py-2 bg-blue-500 text-white font-bold rounded-xl text-sm md:text-lg' : 'btn-3d px-4 py-2 bg-gray-200 text-gray-600 font-bold rounded-xl text-sm md:text-lg';
     }
 
     function renderNoticeOptions() {
@@ -429,9 +402,12 @@
       for(let i=start; i<Math.min(start+2, opts.length); i++) {
         const o = opts[i];
         const btn = document.createElement('button');
-        btn.className = `btn-3d rounded-2xl p-2 flex flex-col items-center justify-center border-4 h-full ${currentNoticeIndex===i ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'}`;
+        btn.className = `btn-3d rounded-2xl p-1 flex flex-col items-center justify-center border-4 h-full ${currentNoticeIndex===i ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'}`;
         btn.onclick = () => { currentNoticeIndex = i; playSound('click'); renderNoticeOptions(); };
-        btn.innerHTML = `<img src="${o.img}" class="h-12 object-contain mb-1"><span class="text-xs font-bold">${o.shortText}</span>`;
+        btn.innerHTML = `
+          <img src="${o.img}" class="h-24 md:h-32 w-full object-contain mb-1">
+          <span class="text-[10px] md:text-xs font-bold text-gray-600 px-1 leading-tight">${o.shortText}</span>
+        `;
         grid.appendChild(btn);
       }
       document.getElementById('prevNoticeBtn').disabled = noticePage === 0;
@@ -440,21 +416,16 @@
 
     function changeNoticePage(d) { noticePage += d; playSound('click'); renderNoticeOptions(); }
 
-    function toggleWateringInPreview() {
-      if(isPreviewWatered) return;
-      isPreviewWatered = true;
-      playSound('water');
-      updatePreviewWaterBtn();
-    }
+    function toggleWateringInPreview() { if(isPreviewWatered) return; isPreviewWatered = true; playSound('water'); updatePreviewWaterBtn(); }
 
     function updatePreviewWaterBtn() {
       const b = document.getElementById('previewWaterBtn');
       if(isPreviewWatered) {
         b.className = "w-full flex-1 bg-gray-200 text-gray-400 rounded-2xl flex flex-col items-center justify-center";
-        b.innerHTML = '<img src="images/water_stamp.png" class="w-12 h-12 opacity-30"><span class="font-bold">できた！</span>';
+        b.innerHTML = '<img src="images/water_stamp.png" class="w-16 h-16 opacity-30"><span class="font-bold text-lg">できた！</span>';
       } else {
         b.className = "btn-3d w-full flex-1 bg-blue-500 text-white rounded-2xl flex flex-col items-center justify-center";
-        b.innerHTML = '<img src="images/water_stamp.png" class="w-12 h-12 drop-shadow"><span class="font-bold">あげたよ！</span>';
+        b.innerHTML = '<img src="images/water_stamp.png" class="w-16 h-16 drop-shadow"><span class="font-bold text-lg">あげたよ！</span>';
       }
     }
 
@@ -462,7 +433,6 @@
       const records = JSON.parse(localStorage.getItem('yasai_records') || '[]');
       const date = new Date();
       const dateKey = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
-      
       let noticeHtml = '';
       if(currentInputMode === 'card') {
         if(currentNoticeIndex === -1) return;
@@ -471,22 +441,16 @@
       } else {
         noticeHtml = `<div>${document.getElementById('noticeText').value}</div>`;
       }
-
       records.push({ id: Date.now(), image: currentImageData, notice: noticeHtml, dateStr: `${date.getMonth()+1}がつ ${date.getDate()}にち`, yasai: currentYasai });
       localStorage.setItem('yasai_records', JSON.stringify(records));
-
       if(isPreviewWatered) {
         const w = JSON.parse(localStorage.getItem('watering_days') || '[]');
         if(!w.includes(dateKey)) {
           w.push(dateKey);
           localStorage.setItem('watering_days', JSON.stringify(w));
           checkLevelUp(w.length);
-        } else {
-          showSuccess();
-        }
-      } else {
-        showSuccess();
-      }
+        } else { showSuccess(); }
+      } else { showSuccess(); }
     }
 
     function checkLevelUp(count) {
@@ -496,9 +460,7 @@
         document.getElementById('modalRankName').innerText = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
         document.getElementById('modal-levelup').classList.remove('hidden');
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      } else {
-        showSuccess();
-      }
+      } else { showSuccess(); }
     }
 
     function showSuccess() {
@@ -526,12 +488,11 @@
       });
     }
 
-    // 先生メニュー
     function startResetPress() { resetTimer = setTimeout(() => { document.getElementById('modal-reset').classList.remove('hidden'); playSound('click'); }, 3000); }
     function cancelResetPress() { clearTimeout(resetTimer); }
     function executeClear() { localStorage.clear(); location.reload(); }
     function goToSelectView() { localStorage.removeItem('user_name'); location.reload(); }
-    function downloadPDF() { /* 実装済みロジックと同様 */ }
+    function downloadPDF() { }
   </script>
 </body>
 </html>
