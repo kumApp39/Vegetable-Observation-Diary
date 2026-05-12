@@ -759,10 +759,13 @@
     function takePhoto() {
       playSound('camera'); 
       const video = document.getElementById('cameraVideo');
+      
+      // ★iPadなどでvideoWidthが0になってエラーで止まるのを防ぐ処理
+      let width = video.videoWidth || 800;
+      let height = video.videoHeight || 600;
+      
       const canvas = document.createElement('canvas');
       const MAX_WIDTH = 800;
-      let width = video.videoWidth;
-      let height = video.videoHeight;
       if (width > MAX_WIDTH) {
         height = Math.floor(height * (MAX_WIDTH / width));
         width = MAX_WIDTH;
@@ -770,8 +773,14 @@
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, width, height);
-      currentImageData = canvas.toDataURL('image/jpeg', 0.6);
+      
+      try {
+        ctx.drawImage(video, 0, 0, width, height);
+        currentImageData = canvas.toDataURL('image/jpeg', 0.6);
+      } catch (err) {
+        // 万が一画像の取得に失敗した場合は、エラーで止まらないように空画像をセット
+        currentImageData = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+      }
       
       document.getElementById('previewImage').src = currentImageData;
       document.getElementById('previewDate').innerText = getTodayString();
@@ -839,6 +848,7 @@
           renderNoticeOptions(); 
         };
         
+        // ★ イラストを大きくし、文字量を少なく表示するように変更
         card.innerHTML = `
           <div class="w-32 h-32 md:w-48 md:h-48 mb-2 md:mb-4 flex-shrink-0 pt-2 transition-transform duration-200 ${isSelected ? 'scale-110' : ''}">
             <img src="${opt.img}" alt="${opt.title}" class="w-full h-full object-contain drop-shadow">
