@@ -104,9 +104,16 @@
 
   <!-- 1. さいしょの がめん（ホーム） -->
   <div id="view-home" class="view hidden flex flex-col items-center justify-start h-full w-full px-4 md:px-8 pt-10 md:pt-16 pb-8 md:pb-12 box-border">
-    <div class="flex items-center gap-3 mb-2 md:mb-4 shrink-0">
-      <img id="homeIconImg" src="" alt="やさい" class="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-md">
-      <h1 id="homeTitle" class="text-2xl md:text-4xl font-bold text-theme-dark">やさいの きろく</h1>
+    <div class="flex items-center gap-3 mb-2 md:mb-4 shrink-0 cursor-pointer"
+         ontouchstart="startResetPress(event)" 
+         ontouchend="cancelResetPress(event)" 
+         ontouchcancel="cancelResetPress(event)" 
+         onmousedown="startResetPress(event)" 
+         onmouseup="cancelResetPress(event)" 
+         onmouseleave="cancelResetPress(event)" 
+         style="touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
+      <img id="homeIconImg" src="" alt="やさい" class="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-md pointer-events-none">
+      <h1 id="homeTitle" class="text-2xl md:text-4xl font-bold text-theme-dark pointer-events-none">やさいの きろく</h1>
     </div>
     
     <div class="flex flex-col md:flex-row gap-3 w-full max-w-5xl flex-1 min-h-0">
@@ -206,13 +213,15 @@
 
     <div class="w-full max-w-4xl mb-6 md:mb-8 shrink-0 bg-blue-50 p-4 md:p-6 rounded-3xl border-4 border-blue-200 flex flex-col items-center shadow-inner">
       <h3 class="text-xl md:text-2xl font-bold text-blue-700 mb-3 md:mb-4 flex items-center gap-2">
-        <span>💧</span> きょうは みずを あげたかな？
+        <img src="images/water_stamp.png" class="w-8 h-8 md:w-10 md:h-10 object-contain" alt="じょうろ">
+        きょうは みずを あげたかな？
       </h3>
       <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="btn-3d bg-blue-500 text-white rounded-[2rem] py-4 px-6 md:px-8 text-2xl md:text-3xl font-bold w-full max-w-md flex justify-center items-center gap-3 transition-all">
         みずを あげたよ！
       </button>
-      <div id="previewWaterStamp" class="hidden mt-4 text-5xl md:text-6xl animate-bounce">
-        🍅
+      <div id="previewWaterStamp" class="hidden mt-4 animate-bounce">
+        <!-- 共通の「じょうろ」スタンプ画像 -->
+        <img src="images/water_stamp.png" class="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-md" alt="みずやりスタンプ">
       </div>
     </div>
     
@@ -269,6 +278,21 @@
         <button onclick="closeConfirm()" class="btn-3d bg-gray-400 text-white text-2xl md:text-3xl px-4 py-5 md:py-6 rounded-3xl font-bold flex-1">やめる</button>
         <button onclick="executeClear()" class="btn-3d bg-red-500 text-white text-2xl md:text-3xl px-4 py-5 md:py-6 rounded-3xl font-bold flex-1">けす</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ★ 先生用リセットメニュー -->
+  <div id="modal-reset" class="hidden absolute inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] p-6 md:p-8 flex flex-col items-center max-w-lg w-full text-center border-8 border-orange-300">
+      <div class="text-xl font-bold text-gray-500 mb-2">せんせいメニュー</div>
+      <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8 leading-normal">どうしますか？</div>
+      
+      <div class="flex flex-col gap-4 w-full mb-6">
+        <button onclick="goToSelectView()" class="btn-3d bg-orange-500 text-white text-xl md:text-2xl py-4 rounded-3xl font-bold w-full">なまえ・やさいを えらびなおす</button>
+        <button onclick="showConfirmFromMenu()" class="btn-3d bg-red-500 text-white text-xl md:text-2xl py-4 rounded-3xl font-bold w-full">きろくを ぜんぶ けす</button>
+      </div>
+
+      <button onclick="closeResetConfirm()" class="btn-3d bg-gray-400 text-white text-xl md:text-2xl py-4 rounded-3xl font-bold w-full max-w-xs">やめる</button>
     </div>
   </div>
 
@@ -377,6 +401,7 @@
 
     let isTeacherMode = false;
     let secretPressTimer = null;
+    let resetPressTimer = null;
 
     function unlockAudio() {
       if (!audioCtx) {
@@ -640,10 +665,10 @@
         cell.appendChild(dayText);
         
         const iconContainer = document.createElement('div');
-        iconContainer.className = "flex-1 flex items-center justify-center text-xl md:text-3xl leading-none"; 
+        iconContainer.className = "flex-1 flex items-center justify-center p-1 w-full h-full"; 
         
         if (isWatered) {
-          iconContainer.innerHTML = `<img src="${YASAI_DATA[currentYasai].img}" alt="スタンプ" class="w-full h-full object-contain">`;
+          iconContainer.innerHTML = `<img src="images/water_stamp.png" alt="水やり" class="w-full h-full object-contain">`;
         }
         
         cell.appendChild(iconContainer);
@@ -987,7 +1012,7 @@
         const recordName = record.userName || currentUserName;
         
         const waterBadge = record.watered 
-          ? `<div class="bg-blue-100 text-blue-700 text-lg md:text-xl px-4 md:px-6 py-2 rounded-full font-bold mt-2 inline-flex items-center gap-2 border-2 border-blue-300 shadow-sm">💧 このひは みずやり したよ！</div>` 
+          ? `<div class="bg-blue-100 text-blue-700 text-lg md:text-xl px-4 md:px-6 py-2 rounded-full font-bold mt-2 inline-flex items-center gap-2 border-2 border-blue-300 shadow-sm"><img src="images/water_stamp.png" class="w-6 h-6 object-contain"> このひは みずやり したよ！</div>` 
           : `<div class="bg-gray-100 text-gray-500 text-base md:text-lg px-4 py-2 rounded-full font-bold mt-2 inline-block">みずやりの きろく なし</div>`;
         
         dateDiv.innerHTML = `
@@ -1041,6 +1066,42 @@
 
     function cancelSecretPress(e) {
       clearTimeout(secretPressTimer);
+    }
+
+    // ★ はじめの画面に戻るための隠しコマンド
+    function startResetPress(e) {
+      cancelResetPress(); 
+      resetPressTimer = setTimeout(() => {
+        playSound('success'); 
+        showResetConfirm();
+      }, 3000); 
+    }
+
+    function cancelResetPress(e) {
+      clearTimeout(resetPressTimer);
+    }
+
+    function showResetConfirm() {
+      document.getElementById('modal-reset').classList.remove('hidden');
+    }
+
+    function closeResetConfirm() {
+      playSound('click');
+      document.getElementById('modal-reset').classList.add('hidden');
+    }
+
+    function goToSelectView() {
+      playSound('click');
+      // 名前と野菜の設定だけを消してリロード（記録は残ります）
+      localStorage.removeItem('user_name');
+      localStorage.removeItem('yasai_type');
+      location.reload();
+    }
+
+    function showConfirmFromMenu() {
+      playSound('click');
+      document.getElementById('modal-reset').classList.add('hidden');
+      showConfirm(); // 既存の「すべて消す」確認画面を呼び出す
     }
 
     function updateTeacherModeUI() {
@@ -1133,7 +1194,7 @@
         const recordName = record.userName || currentUserName;
 
         const waterText = record.watered 
-          ? `💧 このひは みずやり したよ！` 
+          ? `<img src="images/water_stamp.png" style="height: 24px; vertical-align: middle; margin-right: 8px;"> このひは みずやり したよ！` 
           : '（みずやりの きろく なし）';
         const waterColor = record.watered ? '#1d4ed8' : '#9ca3af';
         const waterBg = record.watered ? '#dbeafe' : '#f3f4f6';
