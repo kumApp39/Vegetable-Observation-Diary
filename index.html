@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="やさいかんさつ">
-  <link rel="apple-touch-icon" href="images/tomato_main.png">
+  <link rel="apple-touch-icon" href="icon.png">
   
   <title>やさい かんさつ</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -227,6 +227,17 @@
       </div>
       <h3 id="modalRankName" class="text-2xl font-bold text-blue-700 mb-6 leading-tight"></h3>
       <button onclick="closeLevelUpModal()" class="w-full btn-3d bg-red-500 text-white text-xl font-bold py-4 rounded-full">ありがとう！</button>
+    </div>
+  </div>
+
+  <div id="modal-rank-large" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onclick="this.classList.add('hidden')">
+    <div class="bg-white rounded-[4rem] p-10 border-[12px] border-yellow-400 max-w-md w-full text-center shadow-2xl animate-pop-in" onclick="event.stopPropagation()">
+      <div id="largeRankTitle" class="text-2xl font-bold text-orange-600 mb-6">いまの しょうごう</div>
+      <div class="w-64 h-64 mx-auto mb-6 bg-yellow-50 rounded-full border-8 border-white flex items-center justify-center shadow-inner">
+        <img id="largeRankImg" src="" class="w-48 h-48 object-contain">
+      </div>
+      <h3 id="largeRankName" class="text-3xl font-bold text-blue-700 mb-8 leading-tight"></h3>
+      <button onclick="document.getElementById('modal-rank-large').classList.add('hidden')" class="w-full btn-3d bg-yellow-500 text-white text-2xl font-bold py-5 rounded-full">とじる</button>
     </div>
   </div>
 
@@ -494,7 +505,6 @@
       }
     }
 
-    // ★修正：空白ページ防止のため、高さを調整し overflow: hidden を追加
     function downloadPDF(recordId = null) {
       playSound('click');
       let records = JSON.parse(localStorage.getItem('yasai_records')) || [];
@@ -529,12 +539,12 @@
       sortedRecords.forEach((record, index) => {
         const page = document.createElement('div');
         page.style.width = '794px';
-        page.style.height = '1120px'; // 高さを少し削り、誤差による次ページへの押し出しを防ぐ
+        page.style.height = '1120px'; 
         page.style.padding = '50px';
         page.style.boxSizing = 'border-box';
         page.style.display = 'flex';
         page.style.flexDirection = 'column';
-        page.style.overflow = 'hidden'; // はみ出しを隠す
+        page.style.overflow = 'hidden'; 
         if (index !== sortedRecords.length - 1) page.style.pageBreakAfter = 'always';
 
         const data = YASAI_DATA[record.yasai || currentYasai];
@@ -713,6 +723,8 @@
     function executeClear() { localStorage.clear(); location.reload(); }
     function goToSelectView() { localStorage.removeItem('user_name'); location.reload(); }
     function closeLevelUpModal() { document.getElementById('modal-levelup').classList.add('hidden'); showView('home', false); }
+    
+    // ★ ここの showLargeRank() も最初から実装されていました
     function showLargeRank() {
       const wateringDays = JSON.parse(localStorage.getItem('watering_days') || '[]');
       const count = wateringDays.length;
