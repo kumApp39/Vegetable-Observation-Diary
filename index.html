@@ -61,83 +61,12 @@
     .animate-pop-in {
       animation: popIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
-    
-    /* 修正箇所：通常時は印刷レイアウトを隠す */
-    .print-only { display: none; }
 
-    @media print {
-      .no-print { display: none !important; }
-      .print-only { 
-        display: block !important; 
-        width: 210mm;
-        height: 297mm;
-        padding: 15mm;
-        box-sizing: border-box;
-        background: white;
-      }
-      
-      .pdf-page {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-      }
-
-      .pdf-title {
-        font-size: 36pt;
-        font-weight: 900;
-        text-align: center;
-        margin-bottom: 5mm;
-        color: #000;
-        border-bottom: 4px solid #000;
-        padding-bottom: 3mm;
-      }
-
-      .pdf-header-info {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8mm;
-        font-size: 20pt;
-        font-weight: bold;
-      }
-
-      .pdf-photo-box {
-        width: 100%;
-        height: 130mm;
-        border: 3px solid #000;
-        border-radius: 5mm;
-        margin-bottom: 10mm;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        background: #fff;
-      }
-
-      .pdf-photo-box img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-      }
-
-      .pdf-notes-box {
-        flex: 1;
-        border: 3px solid #000;
-        border-radius: 5mm;
-        padding: 10mm;
-        background-image: linear-gradient(#ccc 1px, transparent 1px);
-        background-size: 100% 14mm;
-        line-height: 14mm;
-      }
-
-      .pdf-notes-text {
-        font-size: 24pt;
-        font-weight: bold;
-        color: #000;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-      }
-      
-      .pdf-hide { display: none !important; }
+    .snap-container {
+      scroll-snap-type: y mandatory;
+    }
+    .snap-item {
+      scroll-snap-align: start;
     }
   </style>
 </head>
@@ -207,6 +136,30 @@
     </div>
   </div>
 
+  <div id="view-list" class="view hidden flex flex-col h-full w-full">
+    <div class="bg-theme-header text-white pt-10 md:pt-14 pb-4 md:pb-6 px-4 md:px-8 flex justify-between items-center shadow-md shrink-0 z-10 relative no-print">
+      <button onclick="showView('home', 'back')" class="bg-theme-btn px-4 md:px-6 py-3 md:py-4 rounded-2xl text-xl md:text-2xl font-bold active:opacity-80 transition-colors">◀ もどる</button>
+      
+      <h2 class="text-2xl md:text-4xl font-bold cursor-pointer" 
+          ontouchstart="startSecretPress(event)" 
+          ontouchend="cancelSecretPress(event)" 
+          ontouchcancel="cancelSecretPress(event)" 
+          onmousedown="startSecretPress(event)" 
+          onmouseup="cancelSecretPress(event)" 
+          onmouseleave="cancelSecretPress(event)" 
+          style="touch-action: none; -webkit-user-select: none; user-select: none;">これまでの きろく</h2>
+          
+      <div class="flex gap-4">
+        <button id="batchPdfBtn" onclick="downloadPDF()" class="hidden btn-3d bg-blue-600 px-3 md:px-4 py-2 md:py-3 rounded-xl text-lg md:text-xl font-bold active:bg-blue-700 transition-colors border-2 border-white shadow-sm flex flex-col items-center">
+          <span>🖨️ ぜんぶ PDF ほぞん</span>
+          <span class="text-xs md:text-sm">(せんせい用)</span>
+        </button>
+      </div>
+    </div>
+    
+    <div id="recordList" class="scrollable snap-container flex-1 p-4 md:p-8 flex flex-col gap-8 pb-16 md:pb-24 bg-gray-100"></div>
+  </div>
+
   <div id="view-camera" class="view hidden flex flex-col items-center justify-center h-full w-full bg-black relative">
     <video id="cameraVideo" autoplay playsinline class="w-full h-full object-cover"></video>
     <div class="absolute top-10 left-6 z-10">
@@ -221,16 +174,13 @@
     <div class="w-full max-w-5xl text-left mb-4 px-2">
       <h2 id="previewDate" class="text-2xl md:text-4xl font-bold text-blue-700"></h2>
     </div>
-
     <div class="absolute top-8 right-6 flex gap-2 z-20">
       <button id="tabCardBtn" onclick="switchInputMode('card')" class="btn-3d px-4 py-2 bg-green-500 text-white font-bold rounded-xl text-sm md:text-lg">カードで</button>
       <button id="tabTextBtn" onclick="switchInputMode('text')" class="btn-3d px-4 py-2 bg-gray-200 text-gray-600 font-bold rounded-xl text-sm md:text-lg">じぶんで</button>
     </div>
-
     <div class="w-full max-w-5xl h-40 md:h-64 shrink-0 bg-gray-100 rounded-3xl shadow-inner flex items-center justify-center overflow-hidden border-4 border-gray-300 mb-6">
       <img id="previewImage" src="" alt="プレビュー" class="max-w-full max-h-full object-contain">
     </div>
-
     <div class="w-full max-w-5xl flex-1 flex flex-col md:flex-row gap-6 min-h-0 mb-8">
       <div class="flex-[2] flex flex-col relative h-full min-h-0">
         <div id="inputModeCard" class="absolute inset-0 bg-white p-4 rounded-3xl shadow-sm border-4 border-green-200 flex flex-col">
@@ -246,31 +196,29 @@
           <textarea id="noticeText" class="w-full rounded-2xl p-4 text-2xl border-4 border-gray-200 bg-gray-50 flex-1 resize-none outline-none focus:border-blue-400" placeholder="ここを タップして かいてね"></textarea>
         </div>
       </div>
-
       <div class="flex-1 bg-blue-50 p-6 rounded-3xl border-4 border-blue-200 flex flex-col items-center justify-center shadow-inner h-full min-h-0">
         <h3 class="text-xl font-bold text-blue-800 mb-4 text-center">💧 みずをあげた？</h3>
         <button id="previewWaterBtn" onclick="toggleWateringInPreview()" class="w-full flex-1 flex flex-col items-center justify-center"></button>
       </div>
     </div>
-    
     <div class="flex gap-6 w-full max-w-5xl shrink-0 mt-auto">
       <button onclick="startCamera()" class="btn-3d bg-gray-400 text-white rounded-[2rem] py-5 text-2xl font-bold flex-1">とりなおす</button>
       <button onclick="saveRecord()" class="btn-3d bg-red-500 text-white rounded-[2rem] py-5 text-2xl font-bold flex-[2]">きろくする</button>
     </div>
   </div>
 
-  <div id="view-list" class="view hidden flex flex-col h-full w-full">
-    <div class="bg-theme-header text-white pt-10 pb-4 px-6 flex justify-between items-center shadow-md shrink-0 no-print">
-      <button onclick="showView('home', 'back')" class="bg-theme-btn px-6 py-3 rounded-2xl text-xl font-bold">◀ もどる</button>
-      <h2 class="text-2xl font-bold" ontouchstart="startPdfPress(event)" ontouchend="cancelPdfPress(event)">これまでの きろく</h2>
-      <div class="w-32 flex justify-end">
-        <button id="batchPdfBtn" onclick="showPdfOptionModal()" class="hidden btn-3d bg-blue-600 px-4 py-2 rounded-xl text-sm font-bold border-2 border-white">PDFで保存する</button>
+  <div id="modal-success" class="hidden absolute inset-0 bg-black/40 z-50 flex items-center justify-center p-4"></div>
+  <div id="modal-error" class="hidden fixed inset-0 bg-black/60 z-[200] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl">
+      <div id="errorIcon" class="text-6xl mb-4">⚠️</div>
+      <h2 id="errorTitle" class="text-2xl font-bold mb-2 text-red-500">エラー</h2>
+      <p id="errorMsg" class="text-lg text-gray-600 mb-6 font-bold"></p>
+      <div id="errorButtons">
+        <button onclick="document.getElementById('modal-error').classList.add('hidden')" class="w-full btn-3d bg-gray-400 text-white py-4 rounded-full font-bold">とじる</button>
       </div>
     </div>
-    <div id="recordList" class="scrollable flex-1 p-4 flex flex-col gap-8 pb-20 bg-gray-100"></div>
   </div>
 
-  <div id="modal-success" class="hidden absolute inset-0 bg-black/40 z-50 flex items-center justify-center p-4"></div>
   <div id="modal-levelup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
     <div class="bg-white rounded-[3rem] p-8 border-[10px] border-yellow-400 max-w-sm w-full text-center shadow-2xl animate-pop-in">
       <h2 class="text-2xl font-bold text-orange-600 mb-4">しょうごう ゲット！</h2>
@@ -281,16 +229,7 @@
       <button onclick="closeLevelUpModal()" class="w-full btn-3d bg-red-500 text-white text-xl font-bold py-4 rounded-full">ありがとう！</button>
     </div>
   </div>
-  <div id="modal-rank-large" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onclick="this.classList.add('hidden')">
-    <div class="bg-white rounded-[4rem] p-10 border-[12px] border-yellow-400 max-w-md w-full text-center shadow-2xl animate-pop-in" onclick="event.stopPropagation()">
-      <div id="largeRankTitle" class="text-2xl font-bold text-orange-600 mb-6">いまの しょうごう</div>
-      <div class="w-64 h-64 mx-auto mb-6 bg-yellow-50 rounded-full border-8 border-white flex items-center justify-center shadow-inner">
-        <img id="largeRankImg" src="" class="w-48 h-48 object-contain">
-      </div>
-      <h3 id="largeRankName" class="text-3xl font-bold text-blue-700 mb-8 leading-tight"></h3>
-      <button onclick="document.getElementById('modal-rank-large').classList.add('hidden')" class="w-full btn-3d bg-yellow-500 text-white text-2xl font-bold py-5 rounded-full">とじる</button>
-    </div>
-  </div>
+
   <div id="modal-reset" class="hidden absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-[2rem] p-8 flex flex-col gap-4 max-w-lg w-full text-center">
       <h2 class="text-2xl font-bold">先生メニュー</h2>
@@ -299,20 +238,12 @@
       <button onclick="document.getElementById('modal-reset').classList.add('hidden')" class="btn-3d bg-gray-400 text-white py-4 rounded-2xl font-bold">やめる</button>
     </div>
   </div>
-  <div id="modal-pdf-option" class="hidden fixed inset-0 bg-black/60 z-[120] flex items-center justify-center p-4">
-    <div class="bg-white rounded-[2rem] p-8 flex flex-col gap-4 max-w-md w-full text-center shadow-2xl">
-      <h2 class="text-2xl font-bold mb-2">ほぞんする 設定</h2>
-      <button onclick="downloadPDF('all')" class="btn-3d bg-blue-600 text-white py-5 rounded-2xl text-xl font-bold">すべての観察日誌を保存する</button>
-      <button onclick="toggleIndividualMode()" class="btn-3d bg-green-500 text-white py-5 rounded-2xl text-xl font-bold">個別に保存する</button>
-      <button onclick="closePdfOptionModal()" class="btn-3d bg-gray-400 text-white py-4 rounded-2xl font-bold mt-2">やめる</button>
-    </div>
-  </div>
 
   <script>
     const YASAI_DATA = {
-      'tomato': { name: 'トマト', img: 'images/tomato_main.png', pdfColor: '#ef4444' },
-      'nasu': { name: 'ナス', img: 'images/nasu_main.png', pdfColor: '#a855f7' },
-      'piman': { name: 'ピーマン', img: 'images/piman_main.png', pdfColor: '#22c55e' }
+      'tomato': { name: 'トマト', img: 'images/tomato_main.png', icon: '🍅', pdfColor: '#ef4444' },
+      'nasu': { name: 'ナス', img: 'images/nasu_main.png', icon: '🍆', pdfColor: '#a855f7' },
+      'piman': { name: 'ピーマン', img: 'images/piman_main.png', icon: '🫑', pdfColor: '#22c55e' }
     };
     const WATERING_TITLES = [
       { min: 30, name: "でんせつの めいじん", img: "images/rank_13.png" },
@@ -344,7 +275,7 @@
         { img: 'images/piman_3.png', shortText: 'しろいはな', text: 'しろい はなが さきました。ピーマンの はなは しろくて かわいいね。' },
         { img: 'images/piman_4.png', shortText: 'あかちゃんの実', text: 'はなの あとに、ちいさな みが できました。もう ピーマンの かたちを しています。' },
         { img: 'images/piman_5.png', shortText: 'おおきくなった実', text: 'ピーマンが おおきく なりました。さわると つるつる しています。' },
-        { img: 'images/piman_6.png', shortText: 'ぴかぴかピーマン', text: 'ぴかぴかの ピーマンが できました。りっぱに そだって うれしいな. ' }
+        { img: 'images/piman_6.png', shortText: 'ぴかぴかピーマン', text: 'ぴかぴかの ピーマンが できました。りっぱに そだって うれしいな。' }
       ]
     };
 
@@ -357,9 +288,9 @@
     let currentInputMode = 'card';
     let videoStream = null;
     let resetTimer = null;
-    let pdfBtnTimer = null;
+    let secretPressTimer = null;
+    let isTeacherMode = false;
     let audioCtx = null;
-    let isIndividualPdfMode = false;
 
     function playSound(type) {
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -371,6 +302,11 @@
       if(type === 'click') { osc.frequency.setValueAtTime(600, now); g.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now+0.1); }
       else if(type === 'photo') { osc.frequency.setValueAtTime(1200, now); g.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now+0.05); }
       else if(type === 'water') { osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(1000, now+0.1); g.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now+0.1); }
+      else if(type === 'success') { osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(1200, now+0.2); g.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now+0.3); }
+    }
+
+    function getFormatDate(date) {
+      return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}_${String(date.getHours()).padStart(2, '0')}${String(date.getMinutes()).padStart(2, '0')}`;
     }
 
     window.onload = () => {
@@ -401,9 +337,9 @@
       document.getElementById('homeIconImg').src = data.img;
       document.getElementById('homeTitle').innerHTML = `${currentUserName}さんの<br>${data.name}の きろく`;
       const root = document.documentElement;
-      if(type === 'tomato') { root.style.setProperty('--theme-bg', '#fef2f2'); root.style.setProperty('--theme-text-main', '#ef4444'); root.style.setProperty('--theme-border-medium', '#f87171'); }
-      else if(type === 'nasu') { root.style.setProperty('--theme-bg', '#faf5ff'); root.style.setProperty('--theme-text-main', '#a855f7'); root.style.setProperty('--theme-border-medium', '#c084fc'); }
-      else { root.style.setProperty('--theme-bg', '#f0fdf4'); root.style.setProperty('--theme-text-main', '#22c55e'); root.style.setProperty('--theme-border-medium', '#4ade80'); }
+      if(type === 'tomato') { root.style.setProperty('--theme-bg', '#fef2f2'); root.style.setProperty('--theme-text-main', '#ef4444'); root.style.setProperty('--theme-border-medium', '#f87171'); root.style.setProperty('--theme-header-bg', '#ef4444'); root.style.setProperty('--theme-header-btn', '#dc2626'); }
+      else if(type === 'nasu') { root.style.setProperty('--theme-bg', '#faf5ff'); root.style.setProperty('--theme-text-main', '#a855f7'); root.style.setProperty('--theme-border-medium', '#c084fc'); root.style.setProperty('--theme-header-bg', '#a855f7'); root.style.setProperty('--theme-header-btn', '#9333ea'); }
+      else { root.style.setProperty('--theme-bg', '#f0fdf4'); root.style.setProperty('--theme-text-main', '#22c55e'); root.style.setProperty('--theme-border-medium', '#4ade80'); root.style.setProperty('--theme-header-bg', '#22c55e'); root.style.setProperty('--theme-header-btn', '#16a34a'); }
       renderWeeklyCalendar();
       updateStatus();
     }
@@ -413,7 +349,7 @@
       document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
       document.getElementById('view-'+name).classList.remove('hidden');
       if(name === 'home') { renderWeeklyCalendar(); updateStatus(); }
-      if(name === 'list') { isIndividualPdfMode = false; renderList(); }
+      if(name === 'list') { renderList(); }
     }
 
     function renderWeeklyCalendar() {
@@ -453,25 +389,218 @@
       document.getElementById('titleProgressBar').style.width = Math.min(100, (count/30)*100) + '%';
     }
 
-    function showLargeRank() {
-      const wateringDays = JSON.parse(localStorage.getItem('watering_days') || '[]');
-      const count = wateringDays.length;
-      let rank = WATERING_TITLES[WATERING_TITLES.length - 1];
-      for(let r of WATERING_TITLES) { if(count >= r.min) { rank = r; break; } }
-      const rankName = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
-      document.getElementById('largeRankImg').src = rank.img;
-      document.getElementById('largeRankName').innerText = rankName;
-      document.getElementById('modal-rank-large').classList.remove('hidden');
-      playSound('click');
+    // ★移植：リスト描画
+    function renderList() {
+      const listContainer = document.getElementById('recordList');
+      listContainer.innerHTML = '';
+      let records = JSON.parse(localStorage.getItem('yasai_records')) || [];
+      const currentData = YASAI_DATA[currentYasai];
+
+      if (records.length === 0) {
+        listContainer.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-full text-gray-500 mt-10 md:mt-20">
+            <div class="text-6xl md:text-7xl mb-6"><img src="${currentData.img}" class="w-32 h-32 object-contain"></div>
+            <div class="text-2xl md:text-3xl font-bold mb-4">まだ きろくが ないよ</div>
+            <div class="text-xl md:text-2xl">しゃしんを とってみよう！</div>
+          </div>
+        `;
+        return;
+      }
+
+      records.sort((a, b) => b.id - a.id);
+      records.forEach((record) => {
+        const item = document.createElement('div');
+        item.className = 'snap-item bg-white p-4 md:p-6 shadow-2xl flex flex-col lg:flex-row border-4 border-theme-light rounded-[2rem] w-full max-w-6xl mx-auto h-auto min-h-[70vh] shrink-0 gap-4 md:gap-6';
+        
+        const leftCol = document.createElement('div');
+        leftCol.className = 'w-full lg:w-3/5 h-72 sm:h-96 lg:h-auto lg:min-h-[60vh] flex items-center justify-center bg-gray-100 border-4 border-gray-300 rounded-2xl overflow-hidden shrink-0 shadow-inner relative';
+        const img = document.createElement('img');
+        img.src = record.image;
+        img.className = 'max-w-full max-h-full object-contain';
+        leftCol.appendChild(img);
+
+        const rightCol = document.createElement('div');
+        rightCol.className = 'w-full lg:w-2/5 flex flex-col flex-1 gap-4 shrink-0';
+        
+        const dateDiv = document.createElement('div');
+        dateDiv.className = `w-full text-center pb-4 border-b-4 border-theme-main flex flex-col items-center shrink-0`;
+        const iconToShow = currentData.icon;
+        const recordName = record.userName || currentUserName;
+        const waterBadge = record.watered 
+          ? `<div class="bg-blue-100 text-blue-700 text-lg md:text-xl px-4 md:px-6 py-2 rounded-full font-bold mt-2 inline-flex items-center gap-2 border-2 border-blue-300 shadow-sm">💧 このひは みずやり したよ！</div>` 
+          : `<div class="bg-gray-100 text-gray-500 text-base md:text-lg px-4 py-2 rounded-full font-bold mt-2 inline-block">みずやりの きろく なし</div>`;
+        
+        dateDiv.innerHTML = `
+          <div class="text-lg md:text-xl text-gray-500 font-bold mb-1">${recordName}さんの</div>
+          <div class="text-3xl md:text-4xl font-bold text-gray-800 flex justify-center items-center gap-2"><span>${iconToShow}</span> ${record.dateStr}</div>
+          <div>${waterBadge}</div>
+        `;
+
+        const teacherBtns = document.createElement('div');
+        teacherBtns.className = 'teacher-pdf-btn hidden flex gap-2 mt-4';
+        
+        const pdfBtn = document.createElement('button');
+        pdfBtn.className = 'btn-3d bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-2xl text-lg font-bold flex items-center gap-2 transition-colors shadow';
+        pdfBtn.innerHTML = '🖨️ PDF';
+        pdfBtn.onclick = () => downloadPDF(record.id);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn-3d bg-red-500 text-white px-5 py-3 rounded-2xl text-lg font-bold transition-colors shadow';
+        delBtn.innerHTML = '🗑️ 消す';
+        delBtn.onclick = () => { if(confirm('この きろくを けしても いい？')) { deleteRecord(record.id); } };
+        
+        teacherBtns.appendChild(pdfBtn);
+        teacherBtns.appendChild(delBtn);
+        dateDiv.appendChild(teacherBtns);
+        
+        const noticeContainer = document.createElement('div');
+        noticeContainer.className = 'w-full grow flex flex-col border-4 border-blue-200 rounded-2xl p-4 md:p-6 bg-blue-50 shadow-inner min-h-[150px] md:min-h-[250px]';
+        const noticeLabel = document.createElement('div');
+        noticeLabel.className = 'text-xl md:text-2xl font-bold text-blue-700 mb-2 md:mb-3 border-b-2 border-blue-200 pb-2 shrink-0';
+        noticeLabel.innerHTML = '✏️ きづいたこと';
+        
+        const noticeText = document.createElement('div');
+        noticeText.className = 'text-lg md:text-2xl text-gray-800 grow overflow-y-auto whitespace-pre-wrap leading-relaxed font-medium';
+        noticeText.innerHTML = record.notice || '（かいてないよ）';
+        
+        noticeContainer.appendChild(noticeLabel);
+        noticeContainer.appendChild(noticeText);
+
+        rightCol.appendChild(dateDiv);
+        rightCol.appendChild(noticeContainer);
+
+        item.appendChild(leftCol);
+        item.appendChild(rightCol);
+        listContainer.appendChild(item);
+      });
+
+      updateTeacherModeUI();
     }
 
+    // ★移植：先生モード起動
+    function startSecretPress(e) {
+      cancelSecretPress();
+      secretPressTimer = setTimeout(() => {
+        isTeacherMode = !isTeacherMode;
+        updateTeacherModeUI();
+        playSound('success'); 
+      }, 3000);
+    }
+    function cancelSecretPress(e) { clearTimeout(secretPressTimer); }
+
+    function updateTeacherModeUI() {
+      const batchBtn = document.getElementById('batchPdfBtn');
+      const individualBtns = document.querySelectorAll('.teacher-pdf-btn');
+      if (isTeacherMode) {
+        batchBtn.classList.remove('hidden');
+        individualBtns.forEach(btn => btn.classList.remove('hidden'));
+      } else {
+        batchBtn.classList.add('hidden');
+        individualBtns.forEach(btn => btn.classList.add('hidden'));
+      }
+    }
+
+    // ★移植：PDF保存機能
+    function downloadPDF(recordId = null) {
+      playSound('click');
+      let records = JSON.parse(localStorage.getItem('yasai_records')) || [];
+      if (records.length === 0) {
+        alert('きろくが まだ ないよ');
+        return;
+      }
+
+      let targetRecords = records;
+      let filename = '';
+      if (recordId !== null) {
+        targetRecords = records.filter(r => r.id === recordId);
+        filename = `${YASAI_DATA[currentYasai].name}のきろく_${getFormatDate(new Date(recordId))}.pdf`;
+      } else {
+        filename = `${YASAI_DATA[currentYasai].name}のきろく_ぜんぶ_${getFormatDate(new Date())}.pdf`;
+      }
+
+      const modal = document.getElementById('modal-error');
+      modal.classList.remove('hidden');
+      document.getElementById('errorIcon').innerText = '⏳';
+      document.getElementById('errorTitle').innerText = 'ちょっと まってね';
+      document.getElementById('errorTitle').className = 'text-2xl font-bold mb-2 text-blue-500';
+      document.getElementById('errorMsg').innerHTML = 'PDFを つくっています...<br>そのまま まってね';
+      document.getElementById('errorButtons').classList.add('hidden');
+
+      const pdfContainer = document.createElement('div');
+      pdfContainer.style.width = '794px'; 
+      pdfContainer.style.backgroundColor = 'white';
+      pdfContainer.style.color = '#1f2937';
+      const sortedRecords = [...targetRecords].sort((a, b) => a.id - b.id);
+
+      sortedRecords.forEach((record, index) => {
+        const page = document.createElement('div');
+        page.style.width = '794px';
+        page.style.height = '1123px'; 
+        page.style.padding = '50px';
+        page.style.boxSizing = 'border-box';
+        page.style.display = 'flex';
+        page.style.flexDirection = 'column';
+        if (index !== sortedRecords.length - 1) page.style.pageBreakAfter = 'always';
+
+        const data = YASAI_DATA[record.yasai || currentYasai];
+        const iconToShow = data.icon;
+        const recordName = record.userName || currentUserName;
+        const waterText = record.watered ? '💧 このひは みずやり したよ！' : '（みずやりの きろく なし）';
+        const waterColor = record.watered ? '#1d4ed8' : '#9ca3af';
+        const waterBg = record.watered ? '#dbeafe' : '#f3f4f6';
+        const waterBorder = record.watered ? '2px solid #93c5fd' : 'none';
+
+        page.innerHTML = `
+          <div style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 10px; color: #6b7280; font-family: sans-serif;">
+            ${recordName}さんの
+          </div>
+          <div style="font-size: 36px; font-weight: bold; text-align: center; margin-bottom: 15px; border-bottom: 4px solid ${data.pdfColor}; padding-bottom: 10px; font-family: sans-serif;">
+            ${iconToShow} ${record.dateStr} の きろく
+          </div>
+          <div style="display: flex; justify-content: center; margin-bottom: 25px;">
+            <div style="background-color: ${waterBg}; color: ${waterColor}; border: ${waterBorder}; font-size: 20px; font-weight: bold; padding: 10px 24px; border-radius: 99px; font-family: sans-serif;">
+              ${waterText}
+            </div>
+          </div>
+          <div style="width: 100%; height: 460px; display: flex; justify-content: center; align-items: center; background-color: #f9fafb; border: 4px solid #e5e7eb; border-radius: 16px; margin-bottom: 30px; overflow: hidden;">
+            <img src="${record.image}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+          </div>
+          <div style="flex: 1; border: 4px solid #bfdbfe; border-radius: 16px; padding: 30px; background-color: #eff6ff; display: flex; flex-direction: column;">
+            <div style="font-size: 24px; font-weight: bold; color: #1d4ed8; margin-bottom: 15px; font-family: sans-serif;">
+              ✏️ きづいたこと
+            </div>
+            <div style="font-size: 24px; line-height: 1.6; white-space: pre-wrap; font-family: sans-serif; flex: 1; font-weight: bold;">${record.notice || '（かいてないよ）'}</div>
+          </div>
+        `;
+        pdfContainer.appendChild(page);
+      });
+
+      const opt = {
+        margin: 0,
+        filename: filename, 
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait' }
+      };
+
+      setTimeout(() => {
+        html2pdf().set(opt).from(pdfContainer).save().then(() => {
+          modal.classList.add('hidden');
+          playSound('success'); 
+        }).catch(e => {
+          modal.classList.add('hidden');
+          alert('PDFが つくれなかったよ。');
+        });
+      }, 500);
+    }
+
+    // カメラ・記録保存等の基本ロジック（そのまま維持）
     async function startCamera() {
       showView('camera', 'photo');
       const video = document.getElementById('cameraVideo');
       videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       video.srcObject = videoStream;
     }
-
     function stopCamera() { if(videoStream) videoStream.getTracks().forEach(t => t.stop()); }
 
     function takePhoto() {
@@ -517,9 +646,7 @@
         btn.className = `btn-3d rounded-2xl p-1 flex flex-col items-center justify-center border-4 h-full overflow-hidden ${currentNoticeIndex===i ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'}`;
         btn.onclick = () => { currentNoticeIndex = i; playSound('click'); renderNoticeOptions(); };
         btn.innerHTML = `
-          <div class="flex-1 w-full flex items-center justify-center p-1">
-            <img src="${o.img}" class="h-full w-full object-contain">
-          </div>
+          <div class="flex-1 w-full flex items-center justify-center p-1"><img src="${o.img}" class="h-full w-full object-contain"></div>
           <span class="text-[11px] md:text-sm font-bold text-gray-600 px-1 py-1 leading-tight shrink-0">${o.shortText}</span>
         `;
         grid.appendChild(btn);
@@ -529,7 +656,6 @@
     }
 
     function changeNoticePage(d) { noticePage += d; playSound('click'); renderNoticeOptions(); }
-
     function toggleWateringInPreview() { if(isPreviewWatered) return; isPreviewWatered = true; playSound('water'); updatePreviewWaterBtn(); }
 
     function updatePreviewWaterBtn() {
@@ -551,26 +677,16 @@
       if(currentInputMode === 'card') {
         if(currentNoticeIndex === -1) return;
         const o = NOTICE_OPTIONS[currentYasai][currentNoticeIndex];
-        noticeHtml = `
-          <div class="flex items-center gap-4">
-            <div class="w-20 h-20 bg-white rounded-2xl border-2 border-green-100 p-2 flex items-center justify-center shrink-0 shadow-sm no-print">
-              <img src="${o.img}" class="max-w-full max-h-full object-contain">
-            </div>
-            <div class="text-xl md:text-2xl font-bold text-green-800 leading-tight">${o.text}</div>
-          </div>
-        `;
+        noticeHtml = o.text;
       } else {
-        noticeHtml = `<div class="text-xl md:text-2xl font-bold text-blue-800 leading-relaxed">${document.getElementById('noticeText').value}</div>`;
+        noticeHtml = document.getElementById('noticeText').value;
       }
-      records.push({ id: Date.now(), image: currentImageData, notice: noticeHtml, dateStr: `${date.getMonth()+1}がつ ${date.getDate()}にち`, yasai: currentYasai });
+      records.push({ id: Date.now(), image: currentImageData, notice: noticeHtml, dateStr: `${date.getMonth()+1}がつ ${date.getDate()}にち`, yasai: currentYasai, watered: isPreviewWatered, userName: currentUserName });
       localStorage.setItem('yasai_records', JSON.stringify(records));
       if(isPreviewWatered) {
         const w = JSON.parse(localStorage.getItem('watering_days') || '[]');
-        if(!w.includes(dateKey)) {
-          w.push(dateKey);
-          localStorage.setItem('watering_days', JSON.stringify(w));
-          checkLevelUp(w.length);
-        } else { showSuccess(); }
+        if(!w.includes(dateKey)) { w.push(dateKey); localStorage.setItem('watering_days', JSON.stringify(w)); checkLevelUp(w.length); } 
+        else { showSuccess(); }
       } else { showSuccess(); }
     }
 
@@ -591,62 +707,7 @@
       setTimeout(() => { m.classList.add('hidden'); showView('home', false); }, 2000);
     }
 
-    function closeLevelUpModal() { document.getElementById('modal-levelup').classList.add('hidden'); showView('home', false); }
-
-    function renderList() {
-      const container = document.getElementById('recordList');
-      container.innerHTML = '';
-      const records = JSON.parse(localStorage.getItem('yasai_records') || '[]');
-      records.reverse().forEach((r) => {
-        const div = document.createElement('div');
-        div.className = `record-card bg-white rounded-[2.5rem] p-5 border-4 border-theme-light shadow-md flex flex-col gap-4 ${isIndividualPdfMode ? 'border-blue-400' : ''}`;
-        div.id = `record-${r.id}`;
-        
-        div.innerHTML = `
-          <div class="print-only">
-            <div class="pdf-page">
-              <div class="pdf-title">${YASAI_DATA[r.yasai].name}の かんさつ</div>
-              <div class="pdf-header-info">
-                <span>${r.dateStr}</span>
-                <span>なまえ：${currentUserName}</span>
-              </div>
-              <div class="pdf-photo-box">
-                <img src="${r.image}">
-              </div>
-              <div class="pdf-notes-box">
-                <div class="pdf-notes-text">${r.notice}</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="no-print">
-            <div class="flex justify-between items-center mb-2 px-2">
-              <div class="flex items-center gap-3">
-                <div class="text-2xl font-bold text-gray-800">${r.dateStr}</div>
-                ${isIndividualPdfMode ? `<button onclick="downloadPDF('single', '${r.id}')" class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full">この1枚をPDFにする</button>` : ''}
-              </div>
-              <button onclick="deleteRecord(${r.id})" class="text-gray-300 hover:text-red-500 p-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </div>
-            
-            <div class="w-full aspect-video bg-gray-50 rounded-2xl overflow-hidden mb-4 border-2 border-gray-100 flex items-center justify-center">
-              <img src="${r.image}" class="max-w-full max-h-full object-contain">
-            </div>
-
-            <div class="bg-gray-50 rounded-2xl p-4 min-h-[100px] border-2 border-gray-100">
-              ${r.notice}
-            </div>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
     function deleteRecord(id) {
-      if(!confirm('この きろくを けしても いい？')) return;
       let records = JSON.parse(localStorage.getItem('yasai_records') || '[]');
       records = records.filter(r => r.id !== id);
       localStorage.setItem('yasai_records', JSON.stringify(records));
@@ -655,34 +716,19 @@
 
     function startResetPress() { resetTimer = setTimeout(() => { document.getElementById('modal-reset').classList.remove('hidden'); playSound('click'); }, 3000); }
     function cancelResetPress() { clearTimeout(resetTimer); }
-    function startPdfPress() { pdfBtnTimer = setTimeout(() => { document.getElementById('batchPdfBtn').classList.toggle('hidden'); playSound('click'); }, 3000); }
-    function cancelPdfPress() { clearTimeout(pdfBtnTimer); }
-
     function executeClear() { localStorage.clear(); location.reload(); }
     function goToSelectView() { localStorage.removeItem('user_name'); location.reload(); }
-    function showPdfOptionModal() { document.getElementById('modal-pdf-option').classList.remove('hidden'); playSound('click'); }
-    function closePdfOptionModal() { document.getElementById('modal-pdf-option').classList.add('hidden'); }
-    function toggleIndividualMode() { isIndividualPdfMode = !isIndividualPdfMode; closePdfOptionModal(); renderList(); playSound('click'); }
-
-    function downloadPDF(mode, recordId) {
-      const element = document.getElementById('view-list');
-      const allCards = document.querySelectorAll('.record-card');
-      closePdfOptionModal();
-      if(mode === 'single') {
-        allCards.forEach(card => { if(card.id !== `record-${recordId}`) card.classList.add('pdf-hide'); });
-      }
-      const filename = `${currentUserName}_${YASAI_DATA[currentYasai].name}_かんさつきろく.pdf`;
-      const opt = {
-        margin: 0,
-        filename: filename,
-        image: { type: 'jpeg', quality: 1.0 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }
-      };
-      html2pdf().set(opt).from(element).save().then(() => {
-        allCards.forEach(card => card.classList.remove('pdf-hide'));
-      });
+    function closeLevelUpModal() { document.getElementById('modal-levelup').classList.add('hidden'); showView('home', false); }
+    function showLargeRank() {
+      const wateringDays = JSON.parse(localStorage.getItem('watering_days') || '[]');
+      const count = wateringDays.length;
+      let rank = WATERING_TITLES[WATERING_TITLES.length - 1];
+      for(let r of WATERING_TITLES) { if(count >= r.min) { rank = r; break; } }
+      const rankName = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
+      document.getElementById('largeRankImg').src = rank.img;
+      document.getElementById('largeRankName').innerText = rankName;
+      document.getElementById('modal-rank-large').classList.remove('hidden');
+      playSound('click');
     }
   </script>
 </body>
