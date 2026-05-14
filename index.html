@@ -257,13 +257,24 @@
       'nasu': { name: 'ナス', img: 'images/nasu_main.png', icon: '🍆', pdfColor: '#a855f7' },
       'piman': { name: 'ピーマン', img: 'images/piman_main.png', icon: '🫑', pdfColor: '#22c55e' }
     };
+    
     const WATERING_TITLES = [
-      { min: 30, name: "でんせつの めいじん", img: "images/rank_13.png" },
-      { min: 20, name: "[YASAI] はかせ", img: "images/rank_6.png" },
+      { min: 100, name: "でんせつの ガーディアン", img: "images/rank_13.png" },
+      { min: 80, name: "たいようの おうじ", img: "images/rank_12.png" },
+      { min: 60, name: "チャンピオン", img: "images/rank_11.png" },
+      { min: 50, name: "ミラクル プロ", img: "images/rank_10.png" },
+      { min: 40, name: "ウルトラ マスター", img: "images/rank_9.png" },
+      { min: 35, name: "スーパー めいじん", img: "images/rank_8.png" },
+      { min: 30, name: "まほうつかい", img: "images/rank_7.png" },
+      { min: 25, name: "[YASAI] はかせ", img: "images/rank_6.png" },
+      { min: 20, name: "[YASAI]の おともだち", img: "images/rank_5.png" },
+      { min: 15, name: "みずやり キャプテン", img: "images/rank_4.png" },
       { min: 10, name: "みずやり ヒーロー", img: "images/rank_3.png" },
-      { min: 3, name: "みずやり たんけんたい", img: "images/rank_2.png" },
+      { min: 6, name: "みずやり たんけんたい", img: "images/rank_2.png" },
+      { min: 3, name: "みずやり 1ねんせい", img: "images/rank_1.png" },
       { min: 0, name: "はじめての みずやり", img: "images/rank_0.png" }
     ];
+
     const NOTICE_OPTIONS = {
       'tomato': [
         { img: 'images/tomato_1.png', shortText: 'なえ', text: 'ちいさな なえを うえました。まだ ちいさいです。おおきくなると いいな。' },
@@ -302,7 +313,7 @@
     let resetTimer = null;
     let secretPressTimer = null;
     let isTeacherMode = false;
-    let isTestMode = false; // ★ テストモード用の変数を追加
+    let isTestMode = false;
     let audioCtx = null;
 
     function playSound(type) {
@@ -390,16 +401,26 @@
       }
     }
 
+    // ★ ゲージの割合計算を修正しました（次のランクの目標値を分母にする）
     function updateStatus() {
       const wateringDays = JSON.parse(localStorage.getItem('watering_days') || '[]');
       const count = wateringDays.length;
       document.getElementById('totalStampCount').innerText = count;
       let rank = WATERING_TITLES[WATERING_TITLES.length - 1];
       for(let r of WATERING_TITLES) { if(count >= r.min) { rank = r; break; } }
+      
+      let nextRankMin = 100;
+      for(let i = WATERING_TITLES.length - 1; i >= 0; i--) {
+        if(WATERING_TITLES[i].min > count) {
+          nextRankMin = WATERING_TITLES[i].min;
+          break;
+        }
+      }
+
       const rankName = rank.name.replace('[YASAI]', YASAI_DATA[currentYasai].name);
       document.getElementById('userTitle').innerText = rankName;
       document.getElementById('currentRankImg').src = rank.img;
-      document.getElementById('titleProgressBar').style.width = Math.min(100, (count/30)*100) + '%';
+      document.getElementById('titleProgressBar').style.width = Math.min(100, (count / nextRankMin) * 100) + '%';
     }
 
     function renderList() {
@@ -737,7 +758,6 @@
       playSound('click');
     }
 
-    // ★ テストモード切り替えとスタンプ追加用の関数
     function toggleTestMode() {
       isTestMode = !isTestMode;
       const btn = document.getElementById('testModeBtn');
@@ -755,7 +775,7 @@
       if(!isTestMode) return;
       playSound('water');
       const w = JSON.parse(localStorage.getItem('watering_days') || '[]');
-      w.push(`test-${Date.now()}`); // テスト用のダミー日付で強制追加
+      w.push(`test-${Date.now()}`); 
       localStorage.setItem('watering_days', JSON.stringify(w));
       updateStatus();
       checkLevelUp(w.length);
